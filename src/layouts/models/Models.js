@@ -22,6 +22,13 @@ const modelEntries = [
         description: 'Third model',
         designerName: 'Designer3'
     },
+    {
+        id: 4,
+        modelName: 'Model4',
+        cost: 400,
+        description: 'Fourth model',
+        designerName: 'Designer4'
+    }
 ];
 
 class Models extends Component {
@@ -29,21 +36,22 @@ class Models extends Component {
         super(props);
     }
 
-    handleBuy(id) {
-        console.log("Buy - selectedID ", id);
+    handleBuy(md) {
+        console.log("Buy - selectedID ", JSON.stringify(md));
     }
 
     render() {
+        //TODO get models from smart contract
         let modelsList= modelEntries.map(function(model, i) {
             return(
-                <tr key={i}>
+                <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
                     <td>{model.id}</td>
                     <td>{model.modelName}</td>
                     <td>{model.cost}</td>
                     <td>{model.description}</td>
                     <td>{model.designerName}</td>
                     <td >
-                    <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model.id)}>Buy</button>
+                    <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
                     </td>
                 </tr>
             )}, this);
