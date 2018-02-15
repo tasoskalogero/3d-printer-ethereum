@@ -2,10 +2,9 @@ import React, { Component } from 'react'
 
 import ModelRegistryContract from '../../../build/contracts/ModelRegistry'
 import store from "../../store";
-import getWeb3 from "../../util/web3/getWeb3";
 
 
-const contract = require('truffle-contract')
+const contract = require('truffle-contract');
 
 const modelEntries = [
     {
