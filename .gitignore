@@ -3,3 +3,6 @@
 
 # npm packages
 node_modules
+
+# Build contracts
+build

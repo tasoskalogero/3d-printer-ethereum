@@ -1,5 +1,12 @@
 import React, { Component } from 'react'
 
+import ModelRegistryContract from '../../../build/contracts/ModelRegistry'
+import store from "../../store";
+import getWeb3 from "../../util/web3/getWeb3";
+
+
+const contract = require('truffle-contract')
+
 const modelEntries = [
     {
         id: 1,
@@ -32,12 +39,29 @@ const modelEntries = [
 ];
 
 class Models extends Component {
+
+    web3Inst = store.getState().web3.web3Instance;
+
     constructor(props) {
         super(props);
+
+    }
+
+    getModels() {
+        const modelRegistry = contract(ModelRegistryContract);
+        modelRegistry.setProvider(this.web3Inst.currentProvider);
+        modelRegistry.deployed().then(function(instance) {
+            return instance.testID.call();
+        })
+            .then(result => {
+                console.log(result.toNumber());
+            });
     }
 
     handleBuy(md) {
+        this.getModels();
         console.log("Buy - selectedID ", JSON.stringify(md));
+
     }
 
     render() {
