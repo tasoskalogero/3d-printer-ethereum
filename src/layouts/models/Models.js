@@ -62,6 +62,7 @@ class Models extends Component {
                 <div className="pure-g">
                     <div className="pure-u-1-1">
                         <h1>Models</h1>
+                        <p>Buy a model below:</p>
                     </div>
                 </div>
 
