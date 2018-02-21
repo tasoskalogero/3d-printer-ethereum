@@ -17,11 +17,11 @@ class Dashboard extends Component {
             <p><strong>Congratulations {this.props.authData.name}!</strong> You are now logged in. If you have a 3D Model you would like to add, please upload it below:</p>
           </div>
         </div>
-        <div> 
-        <AssetInfoContainer/>
-        </div>
         <div>
         <FileUpload/>
+        </div>
+        <div> 
+        <AssetInfoContainer/>
         </div>
 
       </main>

@@ -3,15 +3,15 @@ import store from '../../../store'
 
 const contract = require('truffle-contract')
 
-export const COST_UPDATED = 'COST_UPDATED'
-function costUpdated(cost) {
+export const USER_UPDATED = 'USER_UPDATED'
+function costUpdated(model) {
   return {
-    type: COST_UPDATED,
-    payload: cost
+    type: USER_UPDATED,
+    payload: model,
   }
 }
 
-export function updateCost(cost) {
+export function updateCost(modelname, description, cost) {
   let web3 = store.getState().web3.web3Instance
 
   // Double-check web3's status.
@@ -31,17 +31,18 @@ export function updateCost(cost) {
         if (error) {
           console.error(error);
         }
-
+        
         authentication.deployed().then(function(instance) {
-          authenticationInstance = instance
+        authenticationInstance = instance
+                    // Attempt to login user.
 
-          // Attempt to login user.
-          authenticationInstance.update(cost, {from: coinbase})
+          console.log(authenticationInstance.newModel(modelname, description, cost, {from: coinbase}) + " test")
+          authenticationInstance.newModel(modelname, description, cost, {from: coinbase, gas: 3000000})
           .then(function(result) {
             // If no error, update user.
-
-            dispatch(costUpdated({"cost": cost}))
-
+          //console.log(name)
+            dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}))
+            console.log(result);
             return alert('Thank you, your model has been stored')
           })
           .catch(function(result) {
