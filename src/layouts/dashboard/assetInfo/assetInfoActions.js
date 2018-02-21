@@ -31,19 +31,22 @@ export function updateCost(modelname, description, cost) {
         if (error) {
           console.error(error);
         }
-        
+
         authentication.deployed().then(function(instance) {
         authenticationInstance = instance
                     // Attempt to login user.
 
-          console.log(authenticationInstance.newModel(modelname, description, cost, {from: coinbase}) + " test")
+          
           authenticationInstance.newModel(modelname, description, cost, {from: coinbase, gas: 3000000})
           .then(function(result) {
             // If no error, update user.
-          //console.log(name)
+          
             dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}))
+            
             console.log(result);
             return alert('Thank you, your model has been stored')
+            
+
           })
           .catch(function(result) {
             // If error...

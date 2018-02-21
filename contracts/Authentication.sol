@@ -11,12 +11,14 @@ contract Authentication is Killable {
   struct Model {
     bytes32 modelname;
     bytes32 name;
+    address modeladdress;
     bytes32 description;
     uint cost;
   }
 
-  uint numModels;
-  mapping (uint => Model) models;
+  
+  Model[] public models;
+
 
   
 
@@ -85,13 +87,31 @@ contract Authentication is Killable {
   payable
   onlyExistingUser
   returns (uint modelID) {
-        modelID = numModels++; // modelID is return variable
-        //bytes32 name = users[msg.sender].name;
-        models[modelID] = Model(modelname, users[msg.sender].name, description, cost);
-        return modelID;
+        models.length++;
+        models[models.length-1].modelname = modelname;
+        models[models.length-1].name = users[msg.sender].name;
+        models[models.length-1].modeladdress = msg.sender;
+        models[models.length-1].description = description;
+        models[models.length-1].cost = cost;
+        
+        return models.length;
     }
+
+
+function getModelCount()
+public
+constant
+returns (uint) {
+  return models.length;
 }
 
-    
-
+function getModel(uint index)
+public
+payable
+onlyExistingUser
+returns (bytes32, bytes32, address, bytes32, uint) {
+  
+    return (models[index].modelname, models[index].name, models[index].modeladdress, models[index].description, models[index].cost);
+  }
+}
 
