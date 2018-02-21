@@ -1,14 +1,15 @@
 import React, { Component } from 'react'
+import FileUpload from '../FileUpload'
 
 class AssetInfo extends Component {
   constructor(props, {authData}) {
     super(props)
 
-  
+    
     //console.log(this.props.authData.name);
     this.state = {
       modelname: this.props.modelname,
-      //name: this.props.authData.name,
+      transactionid: '',
       description: this.props.description,
       cost: this.props.cost
     }
@@ -16,14 +17,12 @@ class AssetInfo extends Component {
 
   onInputChangeCost(event) {
     this.setState({ 
-                
                     cost: event.target.value
                      })
   }
     onInputChangeModelName(event) {
     this.setState({ 
                     modelname: event.target.value,
-                  
                      })
   }
     onInputChangeDescription(event) {

@@ -10,7 +10,7 @@ var seed = 'PAUL9NOZTUVHPBKLTFVRJZTOPODGTYHRUIACDYDKRNAQMCUZGNWMDSDZMPWHKQINYFPY
 var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), seed);
  //Passphrase is a 82 character random string.
  //TODO: Have this as a variable separating the OTP and master asset.
- console.log(ciphertext);
+
 
 // Decrypt 
 //var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), seed);

@@ -107,11 +107,25 @@ returns (uint) {
 
 function getModel(uint index)
 public
-payable
+constant
 onlyExistingUser
 returns (bytes32, bytes32, address, bytes32, uint) {
   
     return (models[index].modelname, models[index].name, models[index].modeladdress, models[index].description, models[index].cost);
   }
-}
 
+function purchase(uint index)
+public
+payable
+onlyExistingUser
+returns (bool) {
+
+if (models[index].cost > 0) {
+  address designer = models[index].modeladdress;
+  designer.transfer(models[index].cost);
+
+  return true;
+    }
+  }
+
+}

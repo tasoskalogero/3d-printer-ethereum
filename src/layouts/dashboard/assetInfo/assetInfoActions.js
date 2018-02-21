@@ -40,7 +40,10 @@ export function updateCost(modelname, description, cost) {
           authenticationInstance.newModel(modelname, description, cost, {from: coinbase, gas: 3000000})
           .then(function(result) {
             // If no error, update user.
-          
+            //var NumberofModels  = authenticationInstance.getModelCount();
+            //console.log(NumberofModels);
+
+
             dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}))
             
             console.log(result);

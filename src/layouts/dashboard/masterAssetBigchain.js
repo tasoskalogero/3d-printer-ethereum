@@ -1,7 +1,7 @@
 import encryptor from './encryptor';
 
 
-export default function postToDB(dataPayload) {
+export default async function postToDB(dataPayload) {
 
 const driver = require('bigchaindb-driver')
 
@@ -9,10 +9,7 @@ const driver = require('bigchaindb-driver')
 const API_PATH = 'http://78.47.44.213:8209/api/v1/'
 
 
-const alice = new driver.Ed25519Keypair()
-
-console.log('Dian: ', alice.publicKey)
-
+const user = new driver.Ed25519Keypair()
 
 var encryptedFile = encryptor(dataPayload);
 
@@ -30,66 +27,29 @@ assetdata.model.encrypted_model = encryptedFile; //Possibly need to change the i
 const metadata = {'model_description': 'chair'}
 
 // Construct a transaction payload
-const txCreateAliceSimple = driver.Transaction.makeCreateTransaction(
+const txCreateUserSimple = driver.Transaction.makeCreateTransaction(
         assetdata,
         metadata,
 
         // A transaction needs an output
         [ driver.Transaction.makeOutput(
-                        driver.Transaction.makeEd25519Condition(alice.publicKey))
+                        driver.Transaction.makeEd25519Condition(user.publicKey))
         ],
-        alice.publicKey
+        user.publicKey
 )
 
-// Sign the transaction with private keys of Alice to fulfill it
-const txCreateAliceSimpleSigned = driver.Transaction.signTransaction(txCreateAliceSimple, alice.privateKey)
 
+const txCreateSimpleSigned = driver.Transaction.signTransaction(txCreateUserSimple, user.privateKey)
 // Send the transaction off to BigchainDB
 const conn = new driver.Connection(API_PATH)
 
-conn.postTransaction(txCreateAliceSimpleSigned)
-        // Check status of transaction every 0.5 seconds until fulfilled
-        .then(() => conn.pollStatusAndFetchTransaction(txCreateAliceSimpleSigned.id))
-        .then(retrievedTx => console.log('Transaction', retrievedTx.id, 'successfully posted.'))
-        
-        .then(() => conn.getStatus(txCreateAliceSimpleSigned.id))
-        .then(status => console.log('Retrieved status method 2: ', status))
-        .then(() => conn.searchAssets(txCreateAliceSimpleSigned.id))
-        .then(assets => console.log('Found assets creaed by Dian Balta: ', assets))
+var txid = await conn.postTransaction(txCreateSimpleSigned);
+var retrievedTx = await conn.pollStatusAndFetchTransaction(txCreateSimpleSigned.id);
+console.log('Transaction', retrievedTx.id, 'successfully posted.');
+var status = await conn.getStatus(txCreateSimpleSigned.id);
+var assets = await conn.searchAssets(txCreateSimpleSigned.id);
+
+return retrievedTx.id;
 
 
-        //Add flag for transferring asset to printer if true
-
-
-        // Transfer bicycle to Bob
-        /*
-        .then(() => {
-                const txTransferBob = driver.Transaction.makeTransferTransaction(
-                        // signedTx to transfer and output index
-                        [{ tx: txCreateAliceSimpleSigned, output_index: 0 }],
-                        [driver.Transaction.makeOutput(driver.Transaction.makeEd25519Condition(bob.publicKey))],
-                        // metadata
-                
-                )
-
-                // Sign with alice's private key
-                let txTransferBobSigned = driver.Transaction.signTransaction(txTransferBob, alice.privateKey)
-                console.log('Posting signed transaction: ', txTransferBobSigned)
-
-                // Post and poll status
-                return conn.postTransaction(txTransferBobSigned)
-        })
-        .then(res => {
-                console.log('Response from BDB server:', res)
-                return conn.pollStatusAndFetchTransaction(res.id)
-        })
-        .then(tx => {
-                console.log('Is Bob the owner?', tx['outputs'][0]['public_keys'][0] === bob.publicKey)
-                console.log('Was Alice the previous owner?', tx['inputs'][0]['owners_before'][0] === alice.publicKey )
-        })
-        // Search for asset based on the serial number of the bicycle
-        .then(() => conn.searchAssets('Bicycle Inc.'))
-        .then(assets => console.log('Found assets with serial number Bicycle Inc.:', assets))
-        */
-return;
 }
