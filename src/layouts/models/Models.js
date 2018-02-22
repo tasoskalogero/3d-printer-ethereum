@@ -5,108 +5,132 @@ import AuthenticationContract from '../../../build/contracts/Authentication';
 
 const contract = require('truffle-contract');
 
-const modelEntries = [
-    {
-        id: 1,
-        modelName: 'Model1',
-        cost: 100,
-        description: 'First model',
-        designerName: 'Designer1'
-    },
-    {
-        id: 2,
-        modelName: 'Model2',
-        cost: 200,
-        description: 'Second model',
-        designerName: 'Designer2'
-    },
-    {
-        id: 3,
-        modelName: 'Model3',
-        cost: 300,
-        description: 'Third model',
-        designerName: 'Designer3'
-    },
-    {
-        id: 4,
-        modelName: 'Model4',
-        cost: 400,
-        description: 'Fourth model',
-        designerName: 'Designer4'
-    }
-];
-
 class Models extends Component {
 
-    web3Inst = store.getState().web3.web3Instance;
-
     constructor(props) {
+        console.log("Constructor");
         super(props);
-
+        this.state = {
+            modelsAll: []
+        }
     }
 
-    getModels() {
-        console.log("HERE");
-        const authContract = contract(AuthenticationContract);
-        authContract.setProvider(this.web3Inst.currentProvider);
-        authContract.deployed().then(function(instance) {
-            return instance.getModelCount.call();
-        })
-            .then(count => {
-                console.log(count.toNumber());
+    componentWillMount() {
+        this.getModels()
+            .then(models => {
+                this.setState ({
+                    modelsAll: models
+                });
             });
     }
 
-    handleBuy(md) {
-        this.getModels();
-        console.log("Buy - selectedID ", JSON.stringify(md));
+    async getModels() {
+        let models = [];
+        let web3Inst = store.getState().web3.web3Instance;
+        const authContract = contract(AuthenticationContract);
+        authContract.setProvider(web3Inst.currentProvider);
+        let instance = await authContract.deployed();
+        let count = await instance.getModelCount.call();
 
+        let modelCount = count.toNumber();
+        console.log("Number of models found: ",modelCount);
+        for(let m = 0; m < modelCount; m++) {
+            let retrievedModel = await instance.getModel.call(m, {from: "0xf17f52151ebef6c7334fad080c5704d77216b732"});
+            models.push(
+                {modelName:web3Inst.toUtf8(retrievedModel[0]),
+                    designerName: web3Inst.toUtf8(retrievedModel[1]),
+                    modelAddr: retrievedModel[2],
+                    description: web3Inst.toUtf8(retrievedModel[3]),
+                    cost: retrievedModel[4].toNumber()});
+        }
+        return new Promise(resolve => resolve(models));
     }
+
+    handleBuy(md) {
+        console.log("Buy - selectedID ", JSON.stringify(md));
+    }
+
+    refreshModels() {
+        console.log("Refreshing models");
+        this.getModels()
+            .then(models => {
+                this.setState ({
+                    modelsAll: models
+                });
+            });
+    }
+
 
     render() {
         //TODO get models from smart contract
-        let modelsList= modelEntries.map(function(model, i) {
+        let modelsList= this.state.modelsAll.map(function(model, i) {
             return(
                 <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
-                    <td>{model.id}</td>
                     <td>{model.modelName}</td>
-                    <td>{model.cost}</td>
-                    <td>{model.description}</td>
                     <td>{model.designerName}</td>
+                    <td>{model.modelAddr}</td>
+                    <td>{model.description}</td>
+                    <td>{model.cost}</td>
                     <td >
                     <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
                     </td>
                 </tr>
             )}, this);
-        return  (
-
-            <main className="container">
-
-                <div className="pure-g">
-                    <div className="pure-u-1-1">
-                        <h1>Models</h1>
-                        <p>Buy a model below:</p>
+        if(this.state.modelsAll.length) {
+            return (
+                <main className="container">
+                    <div className="pure-g">
+                        <div className="pure-u-1-1">
+                            <h1>Models</h1>
+                            <p>Buy a model below:</p>
+                        </div>
                     </div>
-                </div>
 
-                <table className="pure-table">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Description</th>
-                        <th>Designer</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
+                    <table className="pure-table">
+                        <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Designer</th>
+                            <th>Model Address</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
 
-                    <tbody>
-                    {modelsList}
-                    </tbody>
-                </table>
-            </main>
-        )
+                        <tbody>
+                        {modelsList}
+                        </tbody>
+                    </table>
+                    <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
+                </main>
+            );
+        } else {
+            return (
+                <main className="container">
+
+                    <div className="pure-g">
+                        <div className="pure-u-1-1">
+                            <h1>Models</h1>
+                            <p>Buy a model below:</p>
+                        </div>
+                    </div>
+
+                    <table className="pure-table">
+                        <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Designer</th>
+                            <th>Model Address</th>
+                            <th>Description</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <button className="pure-button pure-button-primary">Refresh</button>
+                </main>
+            )}
     }
 }
 
