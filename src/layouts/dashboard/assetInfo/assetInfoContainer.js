@@ -16,9 +16,6 @@ const mapDispatchToProps = (dispatch) => {
     onAssetFormSubmit: (modelname, description, cost) => {
       
       //event.preventDefault();
-      console.log(modelname);
-      console.log(description);
-      console.log(cost);
 
       dispatch(updateCost(modelname, description, cost))
     }
