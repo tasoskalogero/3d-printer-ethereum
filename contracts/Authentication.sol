@@ -6,9 +6,19 @@ contract Authentication is Killable {
   struct User {
     bytes32 name;
   }
-  uint public value; //Value of the model
-
   mapping (address => User) private users;
+
+  struct Model {
+    bytes32 modelname;
+    bytes32 name;
+    bytes32 description;
+    uint cost;
+  }
+
+  uint numModels;
+  mapping (uint => Model) models;
+
+  
 
   uint private id; // Stores user id temporarily
 
@@ -69,15 +79,19 @@ contract Authentication is Killable {
     }
   }
 
-  function modelPrice(bytes32 name, uint value)
+
+  function newModel(bytes32 modelname, bytes32 description, uint cost)
   public
   payable
-  onlyValidName(name)
   onlyExistingUser
-  returns (uint) {
-      value = msg.value;
-      return value;
+  returns (uint modelID) {
+        modelID = numModels++; // modelID is return variable
+        //bytes32 name = users[msg.sender].name;
+        models[modelID] = Model(modelname, users[msg.sender].name, description, cost);
+        return modelID;
     }
-  }
+}
+
+    
 
 

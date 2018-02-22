@@ -4,16 +4,23 @@ import { updateCost } from './assetInfoActions'
 
 const mapStateToProps = (state, ownProps) => {
   return {
-    name: state.user.data.name
+    modelname: state.user.data.modelname,
+    description: state.user.data.description,
+    cost: state.user.data.cost
+
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onAssetFormSubmit: (cost) => {
-      event.preventDefault();
+    onAssetFormSubmit: (modelname, description, cost) => {
+      
+      //event.preventDefault();
+      console.log(modelname);
+      console.log(description);
+      console.log(cost);
 
-      dispatch(updateCost(cost))
+      dispatch(updateCost(modelname, description, cost))
     }
   }
 }
