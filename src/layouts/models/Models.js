@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import store from "../../store";
-import AuthenticationContract from '../../../contracts/Authentication.sol';
+import AuthenticationContract from '../../../build/contracts/Authentication';
 
 const contract = require('truffle-contract');
 
