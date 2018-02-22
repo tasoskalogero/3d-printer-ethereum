@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 
 import store from "../../store";
-
+import AuthenticationContract from '../../../contracts/Authentication.sol';
 
 const contract = require('truffle-contract');
 
@@ -46,18 +46,19 @@ class Models extends Component {
     }
 
     getModels() {
-        // const modelRegistry = contract(ModelRegistryContract);
-        // modelRegistry.setProvider(this.web3Inst.currentProvider);
-        // modelRegistry.deployed().then(function(instance) {
-        //     return instance.testID.call();
-        // })
-        //     .then(result => {
-        //         console.log(result.toNumber());
-        //     });
+        console.log("HERE");
+        const authContract = contract(AuthenticationContract);
+        authContract.setProvider(this.web3Inst.currentProvider);
+        authContract.deployed().then(function(instance) {
+            return instance.getModelCount.call();
+        })
+            .then(count => {
+                console.log(count.toNumber());
+            });
     }
 
     handleBuy(md) {
-        // this.getModels();
+        this.getModels();
         console.log("Buy - selectedID ", JSON.stringify(md));
 
     }
