@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 
-import ModelRegistryContract from '../../../build/contracts/ModelRegistry'
 import store from "../../store";
 
 
@@ -47,18 +46,18 @@ class Models extends Component {
     }
 
     getModels() {
-        const modelRegistry = contract(ModelRegistryContract);
-        modelRegistry.setProvider(this.web3Inst.currentProvider);
-        modelRegistry.deployed().then(function(instance) {
-            return instance.testID.call();
-        })
-            .then(result => {
-                console.log(result.toNumber());
-            });
+        // const modelRegistry = contract(ModelRegistryContract);
+        // modelRegistry.setProvider(this.web3Inst.currentProvider);
+        // modelRegistry.deployed().then(function(instance) {
+        //     return instance.testID.call();
+        // })
+        //     .then(result => {
+        //         console.log(result.toNumber());
+        //     });
     }
 
     handleBuy(md) {
-        this.getModels();
+        // this.getModels();
         console.log("Buy - selectedID ", JSON.stringify(md));
 
     }
