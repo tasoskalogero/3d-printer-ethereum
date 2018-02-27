@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => {
     modelname: state.user.data.modelname,
     description: state.user.data.description,
     cost: state.user.data.cost
-
+    
   }
 }
 

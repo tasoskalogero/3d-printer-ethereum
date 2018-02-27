@@ -127,5 +127,4 @@ if (models[index].cost > 0) {
   return true;
     }
   }
-
 }

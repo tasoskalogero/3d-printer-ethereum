@@ -44,6 +44,7 @@ const txCreateSimpleSigned = driver.Transaction.signTransaction(txCreateUserSimp
 const conn = new driver.Connection(API_PATH)
 
 var txid = await conn.postTransaction(txCreateSimpleSigned);
+
 var retrievedTx = await conn.pollStatusAndFetchTransaction(txCreateSimpleSigned.id);
 console.log('Transaction', retrievedTx.id, 'successfully posted.');
 var status = await conn.getStatus(txCreateSimpleSigned.id);

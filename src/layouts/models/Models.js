@@ -28,14 +28,20 @@ class Models extends Component {
         let models = [];
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
+
         authContract.setProvider(web3Inst.currentProvider);
+        let coinbase = web3Inst.eth.getCoinbase();
+        
+        // Log errors, if any.
         let instance = await authContract.deployed();
         let count = await instance.getModelCount.call();
-
         let modelCount = count.toNumber();
+
+
+
         console.log("Number of models found: ",modelCount);
         for(let m = 0; m < modelCount; m++) {
-            let retrievedModel = await instance.getModel.call(m, {from: "0xf17f52151ebef6c7334fad080c5704d77216b732"});
+            let retrievedModel = await instance.getModel.call(m, {from: coinbase});
             models.push(
                 {modelName:web3Inst.toUtf8(retrievedModel[0]),
                     designerName: web3Inst.toUtf8(retrievedModel[1]),
@@ -44,10 +50,19 @@ class Models extends Component {
                     cost: retrievedModel[4].toNumber()});
         }
         return new Promise(resolve => resolve(models));
-    }
+    
+}
 
     handleBuy(md) {
         console.log("Buy - selectedID ", JSON.stringify(md));
+        let web3Inst = store.getState().web3.web3Instance;
+        const authContract = contract(AuthenticationContract);
+
+        authContract.setProvider(web3Inst.currentProvider);
+        let coinbase = web3Inst.eth.getCoinbase();
+        
+        // Log errors, if any.
+        let instance = authContract.deployed(); // Maybe add await here
     }
 
     refreshModels() {
@@ -91,7 +106,7 @@ class Models extends Component {
                         <tr>
                             <th>Model Name</th>
                             <th>Designer</th>
-                            <th>Model Address</th>
+                            <th>Designer's Address</th>
                             <th>Description</th>
                             <th>Price</th>
                             <th>Action</th>
