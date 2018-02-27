@@ -19,6 +19,9 @@ class App extends Component {
         <li className="pure-menu-item">
           <Link to="/dashboard" className="pure-menu-link">Dashboard</Link>
         </li>
+          <li className="pure-menu-item">
+          <Link to="/models" className="pure-menu-link">Models</Link>
+        </li>
         <li className="pure-menu-item">
           <Link to="/profile" className="pure-menu-link">Profile</Link>
         </li>
