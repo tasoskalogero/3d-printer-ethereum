@@ -30,8 +30,8 @@ class Models extends Component {
         const authContract = contract(AuthenticationContract);
 
         authContract.setProvider(web3Inst.currentProvider);
-        let coinbase = web3Inst.eth.getCoinbase();
-        
+        let coinbase = web3Inst.eth.coinbase;
+
         // Log errors, if any.
         let instance = await authContract.deployed();
         let count = await instance.getModelCount.call();
@@ -59,8 +59,8 @@ class Models extends Component {
         const authContract = contract(AuthenticationContract);
 
         authContract.setProvider(web3Inst.currentProvider);
-        let coinbase = web3Inst.eth.getCoinbase();
-        
+        let coinbase = web3Inst.eth.coinbase;
+
         // Log errors, if any.
         let instance = authContract.deployed(); // Maybe add await here
     }
