@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import DropzoneComponent from 'react-dropzone-component';
 import masterAssetBigchain from './masterAssetBigchain';
-require('./dropzone.css')
-require('./filepicker.css')
-require('./dropzone.min.css')
+require('./dropzone.css');
+require('./filepicker.css');
+require('./dropzone.min.css');
 
 
 export class FileUpload extends Component {
@@ -15,7 +15,9 @@ export class FileUpload extends Component {
     postUrl: 'no-url'
 };
 this.djsConfig = { autoProcessQueue: false };
-this.eventHandlers = { addedfile: (file) => masterAssetBigchain(file)}; //Posts the file to BCDB
+this.eventHandlers = { addedfile: (file) => {
+        this.props.callbackFromParent(file);        //return value to parent component
+    }};
 }
   render() {
     const componentConfig = this.componentConfig;

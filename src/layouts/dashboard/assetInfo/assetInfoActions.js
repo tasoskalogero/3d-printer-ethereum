@@ -11,19 +11,19 @@ function costUpdated(model) {
   }
 }
 
-export function updateCost(modelname, description, cost) {
-  let web3 = store.getState().web3.web3Instance
+export function updateValues(modelname, description, cost, bcdbTxID) {
+  let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
   if (typeof web3 !== 'undefined') {
 
     return function(dispatch) {
       // Using truffle-contract we create the authentication object.
-      const authentication = contract(AuthenticationContract)
-      authentication.setProvider(web3.currentProvider)
+      const authentication = contract(AuthenticationContract);
+      authentication.setProvider(web3.currentProvider);
 
       // Declaring this for later so we can chain functions on Authentication.
-      var authenticationInstance
+      var authenticationInstance;
 
       // Get current ethereum wallet.
       web3.eth.getCoinbase((error, coinbase) => {
@@ -33,18 +33,14 @@ export function updateCost(modelname, description, cost) {
         }
 
         authentication.deployed().then(function(instance) {
-        authenticationInstance = instance
+        authenticationInstance = instance;
                     // Attempt to login user.
 
           
-          authenticationInstance.newModel(modelname, description, cost, {from: coinbase, gas: 3000000, value:300})
+          authenticationInstance.newModel(modelname, description, cost, bcdbTxID, {from: coinbase, gas: 3000000, value:300})
           .then(function(result) {
-            // If no error, update user.
-            //var NumberofModels  = authenticationInstance.getModelCount();
-            //console.log(NumberofModels);
 
-
-            dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}))
+            dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}));
             
             console.log(result);
             return alert('Thank you, your model has been stored')

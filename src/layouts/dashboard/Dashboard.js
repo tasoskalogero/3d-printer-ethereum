@@ -18,9 +18,6 @@ class Dashboard extends Component {
           </div>
         </div>
         <div>
-        <FileUpload/>
-        </div>
-        <div> 
         <AssetInfoContainer/>
         </div>
 

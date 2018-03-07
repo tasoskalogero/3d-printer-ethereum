@@ -11,9 +11,10 @@ contract Authentication is Killable {
   struct Model {
     bytes32 modelname;
     bytes32 name;
-    address modeladdress;
+    address owner;
     bytes32 description;
     uint cost;
+    string bcdbTxID;
   }
 
   
@@ -82,7 +83,7 @@ contract Authentication is Killable {
   }
 
 
-  function newModel(bytes32 modelname, bytes32 description, uint cost)
+  function newModel(bytes32 modelname, bytes32 description, uint cost, string bcdbTxID)
   public
   payable
   onlyExistingUser
@@ -90,10 +91,10 @@ contract Authentication is Killable {
         models.length++;
         models[models.length-1].modelname = modelname;
         models[models.length-1].name = users[msg.sender].name;
-        models[models.length-1].modeladdress = msg.sender;
+        models[models.length-1].owner = msg.sender;
         models[models.length-1].description = description;
         models[models.length-1].cost = cost;
-        
+        models[models.length-1].bcdbTxID = bcdbTxID;
         return models.length;
     }
 
@@ -109,9 +110,15 @@ function getModel(uint index)
 public
 constant
 onlyExistingUser
-returns (bytes32, bytes32, address, bytes32, uint) {
+returns (bytes32, bytes32, address, bytes32, uint, string) {
   
-    return (models[index].modelname, models[index].name, models[index].modeladdress, models[index].description, models[index].cost);
+    return (
+    models[index].modelname,
+    models[index].name,
+    models[index].owner,
+    models[index].description,
+    models[index].cost,
+    models[index].bcdbTxID);
   }
 
 function purchase(uint index)
@@ -121,7 +128,7 @@ onlyExistingUser
 returns (bool) {
 
 if (models[index].cost > 0) {
-  address designer = models[index].modeladdress;
+  address designer = models[index].owner;
   designer.transfer(models[index].cost);
 
   return true;

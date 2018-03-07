@@ -42,12 +42,14 @@ class Models extends Component {
         console.log("Number of models found: ",modelCount);
         for(let m = 0; m < modelCount; m++) {
             let retrievedModel = await instance.getModel.call(m, {from: coinbase});
+            console.log('Retrieved model:', retrievedModel);
             models.push(
                 {modelName:web3Inst.toUtf8(retrievedModel[0]),
                     designerName: web3Inst.toUtf8(retrievedModel[1]),
-                    modelAddr: retrievedModel[2],
+                    owner: retrievedModel[2],
                     description: web3Inst.toUtf8(retrievedModel[3]),
-                    cost: retrievedModel[4].toNumber()});
+                    cost: retrievedModel[4].toNumber(),
+                    bcdbTxID: retrievedModel[5]});
         }
         return new Promise(resolve => resolve(models));
     
@@ -83,43 +85,45 @@ class Models extends Component {
                 <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
                     <td>{model.modelName}</td>
                     <td>{model.designerName}</td>
-                    <td>{model.modelAddr}</td>
+                    <td>{model.owner}</td>
                     <td>{model.description}</td>
+                    <td>{model.bcdbTxID}</td>
                     <td>{model.cost}</td>
                     <td >
                     <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
                     </td>
                 </tr>
             )}, this);
-        if(this.state.modelsAll.length) {
-            return (
-                <main className="container">
-                    <div className="pure-g">
-                        <div className="pure-u-1-1">
-                            <h1>Models</h1>
-                            <p>Buy a model below:</p>
-                        </div>
+        return (
+            <main className="container">
+                <div className="pure-g">
+                    <div className="pure-u-1-1">
+                        <h1>Models</h1>
+                        <p>Buy a model below:</p>
                     </div>
+                </div>
 
-                    <table className="pure-table">
-                        <thead>
-                        <tr>
-                            <th>Model Name</th>
-                            <th>Designer</th>
-                            <th>Designer's Address</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Action</th>
-                        </tr>
-                        </thead>
+                <table className="pure-table">
+                    <thead>
+                    <tr>
+                        <th>Model Name</th>
+                        <th>Designer</th>
+                        <th>Owner's Address</th>
+                        <th>Description</th>
+                        <th>BigchainDB TxID</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
 
-                        <tbody>
-                        {modelsList}
-                        </tbody>
-                    </table>
-                    <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
-                </main>
-            );
+                    <tbody>
+                    {modelsList}
+                    </tbody>
+                </table>
+                <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
+            </main>
+        );
+        if(this.state.modelsAll.length) {
         } else {
             return (
                 <main className="container">
@@ -136,8 +140,9 @@ class Models extends Component {
                         <tr>
                             <th>Model Name</th>
                             <th>Designer</th>
-                            <th>Model Address</th>
+                            <th>Owner's Address</th>
                             <th>Description</th>
+                            <th>BigchainDB TxID</th>
                             <th>Price</th>
                             <th>Action</th>
                         </tr>
