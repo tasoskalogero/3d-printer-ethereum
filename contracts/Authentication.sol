@@ -15,15 +15,13 @@ contract Authentication is Killable {
     bytes32 description;
     uint cost;
     string bcdbTxID;
+    bool bought;
   }
 
   
   Model[] public models;
 
-
-  
-
-  uint private id; // Stores user id temporarily
+//    event Purchase(uint _index);
 
   modifier onlyExistingUser {
     // Check if user exists or terminate
@@ -110,7 +108,7 @@ function getModel(uint index)
 public
 constant
 onlyExistingUser
-returns (bytes32, bytes32, address, bytes32, uint, string) {
+returns (bytes32, bytes32, address, bytes32, uint, string, bool) {
   
     return (
     models[index].modelname,
@@ -118,20 +116,19 @@ returns (bytes32, bytes32, address, bytes32, uint, string) {
     models[index].owner,
     models[index].description,
     models[index].cost,
-    models[index].bcdbTxID);
+    models[index].bcdbTxID,
+    models[index].bought);
   }
 
-function purchase(uint index)
-public
-payable
-onlyExistingUser
-returns (bool) {
-//TODO check msg.sender balance and correct index
-if (models[index].cost > 0) {
-  address designer = models[index].owner;
-  designer.transfer(models[index].cost);
+    function purchase(uint index) public payable onlyExistingUser returns (bool) {
+    //TODO check msg.sender balance and correct index
+        if (models[index].cost > 0) {
+            address designer = models[index].owner;
+            designer.transfer(models[index].cost);
+            models[index].bought = true;
+            //Purchase(index);
+            return true;
+        }
 
-  return true;
     }
-  }
 }

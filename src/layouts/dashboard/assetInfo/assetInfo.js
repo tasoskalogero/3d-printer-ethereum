@@ -44,14 +44,14 @@ class AssetInfo extends Component {
       this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID)
   }
 
-  myCallback = (dataFromFileUpload) => {
+    uploadFileCallback = (dataFromFileUpload) => {
       this.setState({uploadedFile: dataFromFileUpload });
   };
 
   render() {
     return(
         <div>
-            <FileUpload callbackFromParent={this.myCallback}/>
+            <FileUpload callbackFromParent={this.uploadFileCallback}/>
               <form className="pure-form pure-form-stacked" onSubmit={this.handleSubmit.bind(this)}>
                 <fieldset>
                   <label htmlFor="ModelName">Name of Model</label>

@@ -1,36 +1,38 @@
 import React, { Component } from 'react'
-
 import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
+import FileUploadButton from "./FileUploadButton";
 
 const contract = require('truffle-contract');
 
 class Models extends Component {
 
     constructor(props) {
-        console.log("Constructor");
         super(props);
         this.state = {
-            modelsAll: []
-        }
+            modelsAll: [],
+            purchasedModels: []
+        };
     }
 
     componentWillMount() {
         this.getModels()
-            .then(models => {
+            .then(result => {
                 this.setState ({
-                    modelsAll: models
+                    modelsAll: result[0],
+                    purchasedModels: result[1]
                 });
             });
     }
 
     async getModels() {
         let models = [];
+        let purchasedModels = [];
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
-
         authContract.setProvider(web3Inst.currentProvider);
-        let coinbase = web3Inst.eth.coinbase;
+
+        let currentAddress = web3Inst.eth.coinbase;
 
         // Log errors, if any.
         let instance = await authContract.deployed();
@@ -41,9 +43,21 @@ class Models extends Component {
 
         console.log("Number of models found: ",modelCount);
         for(let m = 0; m < modelCount; m++) {
-            let retrievedModel = await instance.getModel.call(m, {from: coinbase});
+            let retrievedModel = await instance.getModel.call(m, {from: currentAddress});
             console.log('Retrieved model:', retrievedModel);
-            console.log("COST = ", retrievedModel[4].toNumber());
+            let bought = retrievedModel[6];
+            if(bought)
+                purchasedModels.push({
+                    modelIndex: m,
+                    modelName:web3Inst.toUtf8(retrievedModel[0]),
+                    designerName: web3Inst.toUtf8(retrievedModel[1]),
+                    owner: retrievedModel[2],
+                    description: web3Inst.toUtf8(retrievedModel[3]),
+                    cost: retrievedModel[4].toNumber(),
+                    bcdbTxID: retrievedModel[5],
+                    bought: retrievedModel[6]
+
+                });
             models.push(
                 {
                     modelIndex: m,
@@ -52,41 +66,93 @@ class Models extends Component {
                     owner: retrievedModel[2],
                     description: web3Inst.toUtf8(retrievedModel[3]),
                     cost: retrievedModel[4].toNumber(),
-                    bcdbTxID: retrievedModel[5]});
-        }
-        return new Promise(resolve => resolve(models));
-    
-}
-
-    async handleBuy(md) {
-        console.log("Buy - selectedID ", JSON.stringify(md));
-
-        let web3Inst = store.getState().web3.web3Instance;
-        const authContract = contract(AuthenticationContract);
-
-        authContract.setProvider(web3Inst.currentProvider);
-        let currentAddress = web3Inst.eth.coinbase;
-
-        // Log errors, if any.
-        let instance = await authContract.deployed();
-
-        let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
-        console.log('Bought!: ',success);
-    }
-
-    refreshModels() {
-        console.log("Refreshing models");
-        this.getModels()
-            .then(models => {
-                this.setState ({
-                    modelsAll: models
+                    bcdbTxID: retrievedModel[5],
+                    bought: retrievedModel[6]
                 });
-            });
+        }
+        return new Promise(resolve => resolve([models,purchasedModels]));
+    
     }
 
+    renderPurchasedModels() {
+        let web3 = store.getState().web3.web3Instance;
+        let modelsList= this.state.purchasedModels.map(function(model, i) {
+            if (web3.eth.coinbase === model.owner) {
+                return (
+                    <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
+                        <td>{model.modelName}</td>
+                        <td>{model.designerName}</td>
+                        <td>{model.owner}</td>
+                        <td>{model.description}</td>
+                        <td>{model.bcdbTxID}</td>
+                        <td>{web3.fromWei(model.cost)}</td>
+                        <td>
+                            {web3.eth.coinbase === model.owner && model.bought &&
+                            <FileUploadButton/>
+                            }
+                        </td>
+                    </tr>
+                )
+            }
+        }, this);
+        if(this.state.purchasedModels.length) {
+            return (
+                <main className="container">
+                    <div className="pure-g">
+                        <div className="pure-u-1-1">
+                            <h1>Purchased models</h1>
+                            <p>Upload a copy of the model below:</p>
+                        </div>
+                    </div>
 
-    render() {
-        //TODO get models from smart contract
+                    <table className="pure-table">
+                        <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Designer</th>
+                            <th>Owner's Address</th>
+                            <th>Description</th>
+                            <th>BigchainDB TxID</th>
+                            <th>Price (ETH)</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {modelsList}
+                        </tbody>
+                    </table>
+                </main>
+            )}
+        else {
+            return (
+                <main className="container">
+                    <div className="pure-g">
+                        <div className="pure-u-1-1">
+                            <h1>Purchased models</h1>
+                            <p>Upload a copy of the model below:</p>
+                        </div>
+                    </div>
+
+                    <table className="pure-table">
+                        <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Designer</th>
+                            <th>Owner's Address</th>
+                            <th>Description</th>
+                            <th>BigchainDB TxID</th>
+                            <th>Price (ETH)</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </main>
+            )
+        }
+    }
+
+    renderAllModels() {
         let web3 = store.getState().web3.web3Instance;
         let modelsList= this.state.modelsAll.map(function(model, i) {
             return(
@@ -97,45 +163,14 @@ class Models extends Component {
                     <td>{model.description}</td>
                     <td>{model.bcdbTxID}</td>
                     <td>{web3.fromWei(model.cost)}</td>
-                    <td >
-                    <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
+                    <td>
+                        <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
                     </td>
                 </tr>
             )}, this);
-        return (
-            <main className="container">
-                <div className="pure-g">
-                    <div className="pure-u-1-1">
-                        <h1>Models</h1>
-                        <p>Buy a model below:</p>
-                    </div>
-                </div>
-
-                <table className="pure-table">
-                    <thead>
-                    <tr>
-                        <th>Model Name</th>
-                        <th>Designer</th>
-                        <th>Owner's Address</th>
-                        <th>Description</th>
-                        <th>BigchainDB TxID</th>
-                        <th>Price (ETH)</th>
-                        <th>Action</th>
-                    </tr>
-                    </thead>
-
-                    <tbody>
-                    {modelsList}
-                    </tbody>
-                </table>
-                <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
-            </main>
-        );
         if(this.state.modelsAll.length) {
-        } else {
             return (
                 <main className="container">
-
                     <div className="pure-g">
                         <div className="pure-u-1-1">
                             <h1>Models</h1>
@@ -152,13 +187,82 @@ class Models extends Component {
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
                             <th>Price (ETH)</th>
-                            <th>Action</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        {modelsList}
+                        </tbody>
+                    </table>
+                </main>
+            )}
+        else {
+            return (
+                <main className="container">
+                    <div className="pure-g">
+                        <div className="pure-u-1-1">
+                            <h1>Models</h1>
+                            <p>Buy a model below:</p>
+                        </div>
+                    </div>
+
+                    <table className="pure-table">
+                        <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Designer</th>
+                            <th>Owner's Address</th>
+                            <th>Description</th>
+                            <th>BigchainDB TxID</th>
+                            <th>Price (ETH)</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                     </table>
-                    <button className="pure-button pure-button-primary">Refresh</button>
                 </main>
-            )}
+            )
+        }
+    }
+
+    async handleBuy(md) {
+        console.log("Buy - selectedID ", JSON.stringify(md));
+
+        let web3Inst = store.getState().web3.web3Instance;
+        const authContract = contract(AuthenticationContract);
+
+        authContract.setProvider(web3Inst.currentProvider);
+        let currentAddress = web3Inst.eth.coinbase;
+
+        let instance = await authContract.deployed();
+
+        let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
+        console.log('Bought!: ',success);
+        return alert('Model bought successfully')
+    }
+
+    refreshModels() {
+        console.log("Refreshing models");
+        this.getModels()
+            .then(result => {
+                this.setState ({
+                    modelsAll: result[0],
+                    purchasedModels: result[1]
+                });
+            });
+    }
+
+    render() {
+            return (
+                <div>
+                    {this.renderAllModels()}
+                    <br/>
+                    {this.renderPurchasedModels()}
+                    <br/>
+                    <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
+                </div>
+            )
+
     }
 }
 

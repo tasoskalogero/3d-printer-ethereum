@@ -4,7 +4,7 @@ import store from '../../../store'
 const contract = require('truffle-contract')
 
 export const USER_UPDATED = 'USER_UPDATED'
-function costUpdated(model) {
+function modelUpdated(model) {
   return {
     type: USER_UPDATED,
     payload: model,
@@ -40,7 +40,7 @@ export function updateValues(modelname, description, cost, bcdbTxID) {
           authenticationInstance.newModel(modelname, description, web3.toWei(cost), bcdbTxID, {from: coinbase, gas: 3000000, value:300})
           .then(function(result) {
 
-            dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}));
+            dispatch(modelUpdated({"modelname":modelname, "description":description, "cost": cost}));
             
             console.log(result);
             return alert('Thank you, your model has been stored')

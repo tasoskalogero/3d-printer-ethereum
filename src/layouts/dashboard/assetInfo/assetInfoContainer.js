@@ -8,7 +8,7 @@ const mapStateToProps = (state, ownProps) => {
     description: state.user.data.description,
     cost: state.user.data.cost
   }
-}
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
