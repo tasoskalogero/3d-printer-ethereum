@@ -37,7 +37,7 @@ export function updateValues(modelname, description, cost, bcdbTxID) {
                     // Attempt to login user.
 
           
-          authenticationInstance.newModel(modelname, description, cost, bcdbTxID, {from: coinbase, gas: 3000000, value:300})
+          authenticationInstance.newModel(modelname, description, web3.toWei(cost), bcdbTxID, {from: coinbase, gas: 3000000, value:300})
           .then(function(result) {
 
             dispatch(costUpdated({"modelname":modelname, "description":description, "cost": cost}));

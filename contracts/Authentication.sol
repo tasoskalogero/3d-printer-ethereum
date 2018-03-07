@@ -126,7 +126,7 @@ public
 payable
 onlyExistingUser
 returns (bool) {
-
+//TODO check msg.sender balance and correct index
 if (models[index].cost > 0) {
   address designer = models[index].owner;
   designer.transfer(models[index].cost);

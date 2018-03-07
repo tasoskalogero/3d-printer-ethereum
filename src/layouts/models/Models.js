@@ -43,8 +43,11 @@ class Models extends Component {
         for(let m = 0; m < modelCount; m++) {
             let retrievedModel = await instance.getModel.call(m, {from: coinbase});
             console.log('Retrieved model:', retrievedModel);
+            console.log("COST = ", retrievedModel[4].toNumber());
             models.push(
-                {modelName:web3Inst.toUtf8(retrievedModel[0]),
+                {
+                    modelIndex: m,
+                    modelName:web3Inst.toUtf8(retrievedModel[0]),
                     designerName: web3Inst.toUtf8(retrievedModel[1]),
                     owner: retrievedModel[2],
                     description: web3Inst.toUtf8(retrievedModel[3]),
@@ -55,16 +58,20 @@ class Models extends Component {
     
 }
 
-    handleBuy(md) {
+    async handleBuy(md) {
         console.log("Buy - selectedID ", JSON.stringify(md));
+
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
 
         authContract.setProvider(web3Inst.currentProvider);
-        let coinbase = web3Inst.eth.coinbase;
+        let currentAddress = web3Inst.eth.coinbase;
 
         // Log errors, if any.
-        let instance = authContract.deployed(); // Maybe add await here
+        let instance = await authContract.deployed();
+
+        let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
+        console.log('Bought!: ',success);
     }
 
     refreshModels() {
@@ -80,6 +87,7 @@ class Models extends Component {
 
     render() {
         //TODO get models from smart contract
+        let web3 = store.getState().web3.web3Instance;
         let modelsList= this.state.modelsAll.map(function(model, i) {
             return(
                 <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
@@ -88,7 +96,7 @@ class Models extends Component {
                     <td>{model.owner}</td>
                     <td>{model.description}</td>
                     <td>{model.bcdbTxID}</td>
-                    <td>{model.cost}</td>
+                    <td>{web3.fromWei(model.cost)}</td>
                     <td >
                     <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
                     </td>
@@ -111,7 +119,7 @@ class Models extends Component {
                         <th>Owner's Address</th>
                         <th>Description</th>
                         <th>BigchainDB TxID</th>
-                        <th>Price</th>
+                        <th>Price (ETH)</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -143,7 +151,7 @@ class Models extends Component {
                             <th>Owner's Address</th>
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
-                            <th>Price</th>
+                            <th>Price (ETH)</th>
                             <th>Action</th>
                         </tr>
                         </thead>
