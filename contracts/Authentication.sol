@@ -30,6 +30,7 @@ contract Authentication is Killable {
         string description;
         uint cost;          //in wei
         string bcdbTxID;
+        address buyer;
     }
 
     bytes32[] modelIdentifiers;
@@ -37,7 +38,8 @@ contract Authentication is Killable {
     mapping(bytes32 => Model) allModels;
 
     struct ModelCopy {
-        bytes32 modelId;
+        bytes32 modelID;
+        bytes32 masterModelID;
         string bcdbTxID;
         bool uploadExists;
     }
@@ -54,6 +56,7 @@ contract Authentication is Killable {
     bytes32[] purchasedModelIds;
     //user => PurchaseInventory
     mapping(address => PurchaseInventory) purchases;
+
 
     function login() constant
     public
@@ -116,8 +119,9 @@ contract Authentication is Killable {
     }
 
     function newModelCopy(bytes32 _id, string _bcdbTxId) public returns(bool success){
+
         modelCopyIdentifiers.push(_id);
-        allModelsCopies[_id].modelId = _id;
+        allModelsCopies[_id].modelID = _id;
         allModelsCopies[_id].bcdbTxID = _bcdbTxId;
         allModelsCopies[_id].uploadExists = true;
         return true;
@@ -133,7 +137,7 @@ contract Authentication is Killable {
     }
 
     function getModelDetails(bytes32 id) public view onlyExistingUser
-        returns (bytes32, bytes32, address, string, uint, string) {
+        returns (bytes32, bytes32, address, string, uint, string, address) {
 
         return (
         allModels[id].modelname,
@@ -141,7 +145,8 @@ contract Authentication is Killable {
         allModels[id].owner,
         allModels[id].description,
         allModels[id].cost,
-        allModels[id].bcdbTxID);
+        allModels[id].bcdbTxID,
+        allModels[id].buyer);
     }
 
     function getModelCopyDetails(bytes32 id) public view onlyExistingUser
@@ -153,18 +158,20 @@ contract Authentication is Killable {
         require(msg.sender.balance >= allModels[id].cost);
         require(allModels[id].cost > 0);
 
+        allModels[id].buyer = msg.sender;
         purchases[msg.sender].completedPurchases[id] = msg.value;
         purchasedModelIds.push(id);
 
         return true;
     }
 
-    function getPurchasedModelIds() public returns(bytes32[]) {
+    function getPurchasedModelIds() public view returns(bytes32[]) {
         return purchasedModelIds;
     }
 
-//    function executeTransfer(address from, address toAddr, bytes32 id) {
-//        toAddr.transfer(purchases[from].completedPurchases[id]);
-//
-//    }
+    function executeTransfer(address from, address toAddr, bytes32 id) public returns(bool){
+        toAddr.transfer(purchases[from].completedPurchases[id]);
+        return true;
+
+    }
 }

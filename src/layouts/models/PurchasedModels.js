@@ -46,6 +46,7 @@ class PurchasedModels extends Component {
         for(let i = 0; i< purchasedModelIdentifiers.length; ++i) {
             let id = purchasedModelIdentifiers[i];
             let modelCopyDetails = await instance.getModelCopyDetails.call(id, {from: currentAddress});
+            console.log(modelCopyDetails);
             let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
             console.log('Retrieved PURCHASED model:', retrievedModel);
             purchasedModels.push({

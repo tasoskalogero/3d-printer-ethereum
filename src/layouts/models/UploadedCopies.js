@@ -29,7 +29,6 @@ class UploadedCopies extends Component {
         authContract.setProvider(web3Inst.currentProvider);
 
         let currentAddress = web3Inst.eth.coinbase;
-        console.log(currentAddress);
 
         // Log errors, if any.
         let instance = await authContract.deployed();
@@ -54,7 +53,6 @@ class UploadedCopies extends Component {
     renderCopyModels() {
         let web3 = store.getState().web3.web3Instance;
         let currentAddress = web3.eth.coinbase;
-        console.log(currentAddress);
         let modelsList= this.state.uploadedCopies.map((model, i) => {
             return (
                 <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
@@ -135,8 +133,26 @@ class UploadedCopies extends Component {
 
     }
 
-    handlePrint(model) {
+    async handlePrint(model) {
         console.log("Printing.... ", model);
+
+        let masterModelID = model.modelId;
+        let web3Inst = store.getState().web3.web3Instance;
+        const authContract = contract(AuthenticationContract);
+        authContract.setProvider(web3Inst.currentProvider);
+
+        let currentAddress = web3Inst.eth.coinbase;
+
+        // Log errors, if any.
+        let instance = await authContract.deployed();
+        let retrievedModel = await instance.getModelDetails.call(masterModelID, {from: currentAddress});
+        let buyer = retrievedModel[2];
+        let owner = retrievedModel[6];
+        console.log(buyer);
+        console.log(owner);
+        let success = await instance.executeTransfer.call(buyer, owner, masterModelID, {from: currentAddress});
+        console.log("Purchase comleted: ", success);
+        return alert('Purchase comleted successfully')
     }
 }
 
