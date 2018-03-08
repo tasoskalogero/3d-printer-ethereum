@@ -48,12 +48,12 @@ class RegisteredModels extends Component {
         let instance = await authContract.deployed();
         let modelIdentifiers = await instance.getModelIdentifiers.call();
 
-        console.log("Number of models found: ",modelIdentifiers.length);
+        console.log("Number of master models found: ",modelIdentifiers.length);
         let models = [];
         for(let i = 0; i< modelIdentifiers.length; ++i) {
             let id = modelIdentifiers[i];
             let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
-            console.log('Retrieved model:', retrievedModel);
+            console.log('Retrieved MASTER model:', retrievedModel);
 
             models.push(
                 {

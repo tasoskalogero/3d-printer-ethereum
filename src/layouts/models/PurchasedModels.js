@@ -41,13 +41,13 @@ class PurchasedModels extends Component {
 
         let purchasedModels = [];
         let purchasedModelIdentifiers = await instance.getPurchasedModelIds.call(currentAddress);
-        console.log("Number of models found: ",purchasedModelIdentifiers.length);
+        console.log("Number of PURCHASED models found: ",purchasedModelIdentifiers.length);
 
-        console.log("Purchased IDs: ", purchasedModelIdentifiers);
         for(let i = 0; i< purchasedModelIdentifiers.length; ++i) {
             let id = purchasedModelIdentifiers[i];
             let modelCopyDetails = await instance.getModelCopyDetails.call(id, {from: currentAddress});
             let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
+            console.log('Retrieved PURCHASED model:', retrievedModel);
             purchasedModels.push({
                         modelId: id,
                         modelName: web3Inst.toUtf8(retrievedModel[0]),

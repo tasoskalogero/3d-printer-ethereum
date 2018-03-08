@@ -39,12 +39,12 @@ class UploadedCopies extends Component {
 
         let purchasedModels = [];
         let modelCopyIdentifiers = await instance.getModelCopyIdentifiers.call();
-        console.log("Number of models found: ",modelCopyIdentifiers.length);
+        console.log("Number of COPY models found: ",modelCopyIdentifiers.length);
 
-        console.log("ModelCopy IDs: ", modelCopyIdentifiers);
         for(let i = 0; i< modelCopyIdentifiers.length; ++i) {
             let id = modelCopyIdentifiers[i];
             let modelDetails = await instance.getModelCopyDetails.call(id, {from: currentAddress});
+            console.log('Retrieved COPY model:', modelDetails);
             purchasedModels.push({
                         modelId: id,
                         bcdbTxID: modelDetails[0]
@@ -56,15 +56,17 @@ class UploadedCopies extends Component {
 
     renderPurchasedModels() {
         let modelsList= this.state.uploadedCopies.map((model, i) => {
-                return (
-                    <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
-                        <td style={tdStyle}>{model.modelId}</td>
-                        <td style={tdStyle}>{model.bcdbTxID}</td>
-                        <td>
-                            <button className="pure-button pure-button-primary" onClick={() => this.handlePrint(model)}>Print</button>
-                        </td>
-                    </tr>
-                )
+            return (
+                <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
+                    <td style={tdStyle}>{model.modelId}</td>
+                    <td style={tdStyle}>{model.bcdbTxID}</td>
+                    <td>
+                        <button className="pure-button pure-button-primary"
+                                onClick={() => this.handlePrint(model)}>Print
+                        </button>
+                    </td>
+                </tr>
+            )
         }, this);
         if(this.state.uploadedCopies.length) {
             return (
