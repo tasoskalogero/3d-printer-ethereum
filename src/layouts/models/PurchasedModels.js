@@ -65,6 +65,7 @@ class PurchasedModels extends Component {
 
     renderPurchasedModels() {
         let web3 = store.getState().web3.web3Instance;
+        let currentAddress = web3.eth.coinbase;
         let modelsList= this.state.purchasedModels.map((model, i) => {
                 return (
                     <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
@@ -75,7 +76,7 @@ class PurchasedModels extends Component {
                         <td>{model.description}</td>
                         <td style={tdStyle}>{model.bcdbTxID}</td>
                         <td>{web3.fromWei(model.cost)}</td>
-                        {web3.eth.coinbase === model.owner && !model.uploadExists?
+                        {currentAddress === model.owner && !model.uploadExists?
                             (<td><FileUploadButton modelToUpload={model}/></td>) : (<td></td>)
                         }
                     </tr>

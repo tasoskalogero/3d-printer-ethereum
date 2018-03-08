@@ -32,30 +32,28 @@ contract Authentication is Killable {
         string bcdbTxID;
     }
 
+    bytes32[] modelIdentifiers;
+    //modelId => model
+    mapping(bytes32 => Model) allModels;
+
     struct ModelCopy {
         bytes32 modelId;
         string bcdbTxID;
         bool uploadExists;
     }
 
+    bytes32[] modelCopyIdentifiers;
+    //modelId => ModelCopy
+    mapping(bytes32 => ModelCopy) allModelsCopies;
+
     struct PurchaseInventory {
         //modelId => cost
         mapping(bytes32 => uint) completedPurchases;
     }
 
-
-    bytes32[] modelIdentifiers;
-    //modelId => model
-    mapping(bytes32 => Model) allModels;
-
-    bytes32[] modelCopyIdentifiers;
-    //modelId => ModelCopy
-    mapping(bytes32 => ModelCopy) allModelsCopies;
-
     bytes32[] purchasedModelIds;
     //user => PurchaseInventory
     mapping(address => PurchaseInventory) purchases;
-
 
     function login() constant
     public
@@ -152,7 +150,6 @@ contract Authentication is Killable {
     }
 
     function purchase(bytes32 id) public payable onlyExistingUser returns (bool) {
-        //TODO check msg.sender balance and correct index
         require(msg.sender.balance >= allModels[id].cost);
         require(allModels[id].cost > 0);
 

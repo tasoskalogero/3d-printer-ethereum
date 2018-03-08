@@ -3,14 +3,10 @@ import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
 
 const contract = require('truffle-contract');
-const tdStyle = {
-    width:'300px',
-    wordWrap:'break-word',
-    display: 'inline-block'
-};
+
+const PRINTER = "0x821aea9a577a9b44299b9c15c88cf3087f3b5544";
 
 class UploadedCopies extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -33,6 +29,7 @@ class UploadedCopies extends Component {
         authContract.setProvider(web3Inst.currentProvider);
 
         let currentAddress = web3Inst.eth.coinbase;
+        console.log(currentAddress);
 
         // Log errors, if any.
         let instance = await authContract.deployed();
@@ -54,17 +51,21 @@ class UploadedCopies extends Component {
 
     }
 
-    renderPurchasedModels() {
+    renderCopyModels() {
+        let web3 = store.getState().web3.web3Instance;
+        let currentAddress = web3.eth.coinbase;
+        console.log(currentAddress);
         let modelsList= this.state.uploadedCopies.map((model, i) => {
             return (
                 <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
-                    <td style={tdStyle}>{model.modelId}</td>
-                    <td style={tdStyle}>{model.bcdbTxID}</td>
-                    <td>
-                        <button className="pure-button pure-button-primary"
-                                onClick={() => this.handlePrint(model)}>Print
-                        </button>
-                    </td>
+                    <td>{model.modelId}</td>
+                    <td>{model.bcdbTxID}</td>
+                    {currentAddress.toUpperCase() === PRINTER.toUpperCase() ?
+                        (<td>
+                            <button className="pure-button pure-button-primary"
+                                    onClick={() => this.handlePrint(model)}>Print
+                            </button>
+                        </td>):(<td></td>)}
                 </tr>
             )
         }, this);
@@ -82,6 +83,7 @@ class UploadedCopies extends Component {
                         <tr>
                             <th>ID</th>
                             <th>BigchainDB TxID</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
 
@@ -105,6 +107,7 @@ class UploadedCopies extends Component {
                         <tr>
                             <th>ID</th>
                             <th>BigchainDB TxID</th>
+                            <th>Actions</th>
                         </tr>
                         </thead>
                     </table>
@@ -125,7 +128,7 @@ class UploadedCopies extends Component {
     render() {
             return (
                 <div>
-                    {this.renderPurchasedModels()}
+                    {this.renderCopyModels()}
                     <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
                 </div>
             )
