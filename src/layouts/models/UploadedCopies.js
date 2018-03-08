@@ -1,22 +1,20 @@
 import React, { Component } from 'react'
 import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
-import FileUploadButton from "./FileUploadButton";
 
 const contract = require('truffle-contract');
-
 const tdStyle = {
     width:'300px',
     wordWrap:'break-word',
     display: 'inline-block'
 };
 
-class PurchasedModels extends Component {
+class UploadedCopies extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            purchasedModels: []
+            uploadedCopies: []
         };
     }
 
@@ -24,7 +22,7 @@ class PurchasedModels extends Component {
         this.getModels()
             .then(result => {
                 this.setState ({
-                    purchasedModels: result
+                    uploadedCopies: result
                 });
             });
     }
@@ -40,23 +38,16 @@ class PurchasedModels extends Component {
         let instance = await authContract.deployed();
 
         let purchasedModels = [];
-        let purchasedModelIdentifiers = await instance.getPurchasedModelIds.call(currentAddress);
-        console.log("Number of models found: ",purchasedModelIdentifiers.length);
+        let modelCopyIdentifiers = await instance.getModelCopyIdentifiers.call();
+        console.log("Number of models found: ",modelCopyIdentifiers.length);
 
-        console.log("Purchased IDs: ", purchasedModelIdentifiers);
-        for(let i = 0; i< purchasedModelIdentifiers.length; ++i) {
-            let id = purchasedModelIdentifiers[i];
-            let modelCopyDetails = await instance.getModelCopyDetails.call(id, {from: currentAddress});
-            let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
+        console.log("ModelCopy IDs: ", modelCopyIdentifiers);
+        for(let i = 0; i< modelCopyIdentifiers.length; ++i) {
+            let id = modelCopyIdentifiers[i];
+            let modelDetails = await instance.getModelCopyDetails.call(id, {from: currentAddress});
             purchasedModels.push({
                         modelId: id,
-                        modelName: web3Inst.toUtf8(retrievedModel[0]),
-                        designerName: web3Inst.toUtf8(retrievedModel[1]),
-                        owner: retrievedModel[2],
-                        description: retrievedModel[3],
-                        cost: retrievedModel[4].toNumber(),
-                        bcdbTxID: retrievedModel[5],
-                        uploadExists: modelCopyDetails[1] //true if there is an uploaded copy of this model
+                        bcdbTxID: modelDetails[0]
                     });
         }
         return new Promise(resolve => resolve(purchasedModels));
@@ -64,29 +55,23 @@ class PurchasedModels extends Component {
     }
 
     renderPurchasedModels() {
-        let web3 = store.getState().web3.web3Instance;
-        let modelsList= this.state.purchasedModels.map((model, i) => {
+        let modelsList= this.state.uploadedCopies.map((model, i) => {
                 return (
                     <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
                         <td style={tdStyle}>{model.modelId}</td>
-                        <td>{model.modelName}</td>
-                        <td>{model.designerName}</td>
-                        <td>{model.owner}</td>
-                        <td>{model.description}</td>
                         <td style={tdStyle}>{model.bcdbTxID}</td>
-                        <td>{web3.fromWei(model.cost)}</td>
-                        {web3.eth.coinbase === model.owner && !model.uploadExists?
-                            (<td><FileUploadButton modelToUpload={model}/></td>) : (<td></td>)
-                        }
+                        <td>
+                            <button className="pure-button pure-button-primary" onClick={() => this.handlePrint(model)}>Print</button>
+                        </td>
                     </tr>
                 )
         }, this);
-        if(this.state.purchasedModels.length) {
+        if(this.state.uploadedCopies.length) {
             return (
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Purchased models</h1>
+                            <h1>Uploaded copies</h1>
                         </div>
                     </div>
 
@@ -94,13 +79,7 @@ class PurchasedModels extends Component {
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Model Name</th>
-                            <th>Designer</th>
-                            <th>Owner's Address</th>
-                            <th>Description</th>
                             <th>BigchainDB TxID</th>
-                            <th>Price (ETH)</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
 
@@ -115,7 +94,7 @@ class PurchasedModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Purchased models</h1>
+                            <h1>Uploaded copies</h1>
                         </div>
                     </div>
 
@@ -123,13 +102,7 @@ class PurchasedModels extends Component {
                         <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Model Name</th>
-                            <th>Designer</th>
-                            <th>Owner's Address</th>
-                            <th>Description</th>
                             <th>BigchainDB TxID</th>
-                            <th>Price (ETH)</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
                     </table>
@@ -142,7 +115,7 @@ class PurchasedModels extends Component {
         this.getModels()
             .then(result => {
                 this.setState ({
-                    purchasedModels: result
+                    uploadedCopies: result
                 });
             });
     }
@@ -156,6 +129,10 @@ class PurchasedModels extends Component {
             )
 
     }
+
+    handlePrint(model) {
+        console.log("Printing.... ", model);
+    }
 }
 
-export default PurchasedModels
+export default UploadedCopies

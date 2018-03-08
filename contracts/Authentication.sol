@@ -30,19 +30,32 @@ contract Authentication is Killable {
         string description;
         uint cost;          //in wei
         string bcdbTxID;
-//        bool bought;
     }
 
-    bytes32[] modelIdentifiers;
-    //modelId => model
-    mapping(bytes32 => Model) allModels;
+    struct ModelCopy {
+        bytes32 modelId;
+        string bcdbTxID;
+        bool uploadExists;
+    }
 
     struct PurchaseInventory {
         //modelId => cost
         mapping(bytes32 => uint) completedPurchases;
     }
-    mapping(address => PurchaseInventory) purchases;
+
+
+    bytes32[] modelIdentifiers;
+    //modelId => model
+    mapping(bytes32 => Model) allModels;
+
+    bytes32[] modelCopyIdentifiers;
+    //modelId => ModelCopy
+    mapping(bytes32 => ModelCopy) allModelsCopies;
+
     bytes32[] purchasedModelIds;
+    //user => PurchaseInventory
+    mapping(address => PurchaseInventory) purchases;
+
 
     function login() constant
     public
@@ -104,9 +117,21 @@ contract Authentication is Killable {
         return success;
     }
 
+    function newModelCopy(bytes32 _id, string _bcdbTxId) public returns(bool success){
+        modelCopyIdentifiers.push(_id);
+        allModelsCopies[_id].modelId = _id;
+        allModelsCopies[_id].bcdbTxID = _bcdbTxId;
+        allModelsCopies[_id].uploadExists = true;
+        return true;
+    }
 
-    function getIdentifiers() public view returns (bytes32[]) {
+
+    function getModelIdentifiers() public view returns (bytes32[]) {
         return modelIdentifiers;
+    }
+
+    function getModelCopyIdentifiers() public view returns (bytes32[]) {
+        return modelCopyIdentifiers;
     }
 
     function getModelDetails(bytes32 id) public view onlyExistingUser
@@ -119,7 +144,11 @@ contract Authentication is Killable {
         allModels[id].description,
         allModels[id].cost,
         allModels[id].bcdbTxID);
-//        allModels[id].bought);
+    }
+
+    function getModelCopyDetails(bytes32 id) public view onlyExistingUser
+    returns(string, bool) {
+        return (allModelsCopies[id].bcdbTxID,allModelsCopies[id].uploadExists);
     }
 
     function purchase(bytes32 id) public payable onlyExistingUser returns (bool) {
@@ -130,13 +159,13 @@ contract Authentication is Killable {
         purchases[msg.sender].completedPurchases[id] = msg.value;
         purchasedModelIds.push(id);
 
-//        allModels[id].bought = true;
         return true;
     }
 
     function getPurchasedModelIds() public returns(bytes32[]) {
         return purchasedModelIds;
     }
+
 //    function executeTransfer(address from, address toAddr, bytes32 id) {
 //        toAddr.transfer(purchases[from].completedPurchases[id]);
 //

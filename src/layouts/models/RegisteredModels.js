@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
 import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
-import FileUploadButton from "./FileUploadButton";
-import PurchasedModels from "./PurchasedModels";
 
 const contract = require('truffle-contract');
+
+const tdStyle = {
+    width:'300px',
+    wordWrap:'break-word',
+    display: 'inline-block'
+};
 
 class RegisteredModels extends Component {
 
@@ -28,7 +32,7 @@ class RegisteredModels extends Component {
         this.getModels()
             .then(result => {
                 this.setState ({
-                    purchasedModels: result
+                    modelsAll: result
                 });
             });
     }
@@ -42,7 +46,7 @@ class RegisteredModels extends Component {
 
         // Log errors, if any.
         let instance = await authContract.deployed();
-        let modelIdentifiers = await instance.getIdentifiers.call();
+        let modelIdentifiers = await instance.getModelIdentifiers.call();
 
         console.log("Number of models found: ",modelIdentifiers.length);
         let models = [];
@@ -60,7 +64,6 @@ class RegisteredModels extends Component {
                     description: retrievedModel[3],
                     cost: retrievedModel[4].toNumber(),
                     bcdbTxID: retrievedModel[5]
-                    // bought: retrievedModel[6]
                 });
         }
 
@@ -73,11 +76,12 @@ class RegisteredModels extends Component {
         let modelsList= this.state.modelsAll.map(function(model, i) {
             return(
                 <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
+                    <td style={tdStyle}>{model.modelId}</td>
                     <td>{model.modelName}</td>
                     <td>{model.designerName}</td>
                     <td>{model.owner}</td>
                     <td>{model.description}</td>
-                    <td>{model.bcdbTxID}</td>
+                    <td style={tdStyle}>{model.bcdbTxID}</td>
                     <td>{web3.fromWei(model.cost)}</td>
                     <td>
                         <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
@@ -89,14 +93,14 @@ class RegisteredModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Models</h1>
-                            <p>Buy a model below:</p>
+                            <h1>Available models</h1>
                         </div>
                     </div>
 
                     <table className="pure-table">
                         <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Model Name</th>
                             <th>Designer</th>
                             <th>Owner's Address</th>
@@ -118,14 +122,14 @@ class RegisteredModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Models</h1>
-                            <p>Buy a model below:</p>
+                            <h1>Available models</h1>
                         </div>
                     </div>
 
                     <table className="pure-table">
                         <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Model Name</th>
                             <th>Designer</th>
                             <th>Owner's Address</th>
