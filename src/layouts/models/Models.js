@@ -36,47 +36,76 @@ class Models extends Component {
 
         // Log errors, if any.
         let instance = await authContract.deployed();
-        let count = await instance.getModelCount.call();
-        let modelCount = count.toNumber();
+        let modelIdentifiers = await instance.getIdentifiers.call();
 
 
-
-        console.log("Number of models found: ",modelCount);
-        for(let m = 0; m < modelCount; m++) {
-            let retrievedModel = await instance.getModel.call(m, {from: currentAddress});
+        console.log("Number of models found: ",modelIdentifiers.length);
+        for(let i = 0; i< modelIdentifiers.length; ++i) {
+            let id = modelIdentifiers[i];
+            let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
             console.log('Retrieved model:', retrievedModel);
+
             let bought = retrievedModel[6];
-            if(bought)
+            if (bought) {
                 purchasedModels.push({
-                    modelIndex: m,
-                    modelName:web3Inst.toUtf8(retrievedModel[0]),
+                    modelId: id,
+                    modelName: web3Inst.toUtf8(retrievedModel[0]),
                     designerName: web3Inst.toUtf8(retrievedModel[1]),
                     owner: retrievedModel[2],
-                    description: web3Inst.toUtf8(retrievedModel[3]),
+                    description: retrievedModel[3],
                     cost: retrievedModel[4].toNumber(),
                     bcdbTxID: retrievedModel[5],
                     bought: retrievedModel[6]
-
                 });
+            }
             models.push(
                 {
-                    modelIndex: m,
-                    modelName:web3Inst.toUtf8(retrievedModel[0]),
+                    modelId: id,
+                    modelName: web3Inst.toUtf8(retrievedModel[0]),
                     designerName: web3Inst.toUtf8(retrievedModel[1]),
                     owner: retrievedModel[2],
-                    description: web3Inst.toUtf8(retrievedModel[3]),
+                    description: retrievedModel[3],
                     cost: retrievedModel[4].toNumber(),
                     bcdbTxID: retrievedModel[5],
                     bought: retrievedModel[6]
                 });
         }
+
+        // for(let m = 0; m < modelCount; m++) {
+        //     let retrievedModel = await instance.getModel.call(m, {from: currentAddress});
+        //     console.log('Retrieved model:', retrievedModel);
+        //     let bought = retrievedModel[6];
+        //     if(bought)
+        //         purchasedModels.push({
+        //             modelIndex: m,
+        //             modelName:web3Inst.toUtf8(retrievedModel[0]),
+        //             designerName: web3Inst.toUtf8(retrievedModel[1]),
+        //             owner: retrievedModel[2],
+        //             description: web3Inst.toUtf8(retrievedModel[3]),
+        //             cost: retrievedModel[4].toNumber(),
+        //             bcdbTxID: retrievedModel[5],
+        //             bought: retrievedModel[6]
+        //
+        //         });
+        //     models.push(
+        //         {
+        //             modelIndex: m,
+        //             modelName:web3Inst.toUtf8(retrievedModel[0]),
+        //             designerName: web3Inst.toUtf8(retrievedModel[1]),
+        //             owner: retrievedModel[2],
+        //             description: web3Inst.toUtf8(retrievedModel[3]),
+        //             cost: retrievedModel[4].toNumber(),
+        //             bcdbTxID: retrievedModel[5],
+        //             bought: retrievedModel[6]
+        //         });
+        // }
         return new Promise(resolve => resolve([models,purchasedModels]));
     
     }
 
     renderPurchasedModels() {
         let web3 = store.getState().web3.web3Instance;
-        let modelsList= this.state.purchasedModels.map(function(model, i) {
+        let modelsList= this.state.purchasedModels.map((model, i) => {
             if (web3.eth.coinbase === model.owner) {
                 return (
                     <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
@@ -93,6 +122,8 @@ class Models extends Component {
                         </td>
                     </tr>
                 )
+            } else {
+                return (<tr></tr>)
             }
         }, this);
         if(this.state.purchasedModels.length) {
@@ -236,9 +267,9 @@ class Models extends Component {
 
         let instance = await authContract.deployed();
 
-        let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
-        console.log('Bought!: ',success);
-        return alert('Model bought successfully')
+        // let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
+        // console.log('Bought!: ',success);
+        // return alert('Model bought successfully')
     }
 
     refreshModels() {

@@ -58,7 +58,7 @@ class AssetInfo extends Component {
                   <input id="modelname" type="text" value={this.state.modelname} onChange={this.onInputChangeModelName.bind(this)} placeholder="Please name your model" />
                   <label htmlFor="description">Describe Your Model</label>
                   <input id="description" type="text" value={this.state.description} onChange={this.onInputChangeDescription.bind(this)} placeholder="Enter a description" />
-                  <label htmlFor="cost">Cost in Ether</label>
+                  <label htmlFor="cost">Cost (ETH)</label>
                   <input id="cost" type="number" min="0" step="0.01" value={this.state.cost} onChange={this.onInputChangeCost.bind(this)} />
                   <span className="pure-form-message">This is a required field.</span>
                   <br />
