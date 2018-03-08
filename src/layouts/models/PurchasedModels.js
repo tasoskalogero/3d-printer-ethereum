@@ -40,7 +40,7 @@ class PurchasedModels extends Component {
         let instance = await authContract.deployed();
 
         let purchasedModels = [];
-        let purchasedModelIdentifiers = await instance.getPurchasedModelIds.call(currentAddress);
+        let purchasedModelIdentifiers = await instance.getPurchasedModelIds.call();
         console.log("Number of PURCHASED models found: ",purchasedModelIdentifiers.length);
 
         for(let i = 0; i< purchasedModelIdentifiers.length; ++i) {

@@ -84,7 +84,7 @@ class RegisteredModels extends Component {
                     <td style={tdStyle}>{model.bcdbTxID}</td>
                     <td>{web3.fromWei(model.cost)}</td>
                     <td>
-                        <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model)}>Buy</button>
+                        <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model.modelId, model.cost)}>Buy</button>
                     </td>
                 </tr>
             )}, this);
@@ -146,8 +146,8 @@ class RegisteredModels extends Component {
 
     }
 
-    async handleBuy(md) {
-        console.log("Buy - selectedID ", JSON.stringify(md));
+    async handleBuy(mdID, cost) {
+        console.log("Buy - selectedID ", mdID);
 
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
@@ -157,7 +157,7 @@ class RegisteredModels extends Component {
 
         let instance = await authContract.deployed();
 
-        let success = await instance.purchase(md.modelId, {from: currentAddress, value: md.cost});
+        let success = await instance.purchase(mdID, {from: currentAddress, value: cost});
         console.log('Bought!: ',success);
         return alert('Model bought successfully')
 
