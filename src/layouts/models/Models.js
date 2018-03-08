@@ -26,8 +26,6 @@ class Models extends Component {
     }
 
     async getModels() {
-        let models = [];
-        let purchasedModels = [];
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
         authContract.setProvider(web3Inst.currentProvider);
@@ -38,26 +36,26 @@ class Models extends Component {
         let instance = await authContract.deployed();
         let modelIdentifiers = await instance.getIdentifiers.call();
 
-
         console.log("Number of models found: ",modelIdentifiers.length);
+        let models = [];
         for(let i = 0; i< modelIdentifiers.length; ++i) {
             let id = modelIdentifiers[i];
             let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
             console.log('Retrieved model:', retrievedModel);
 
-            let bought = retrievedModel[6];
-            if (bought) {
-                purchasedModels.push({
-                    modelId: id,
-                    modelName: web3Inst.toUtf8(retrievedModel[0]),
-                    designerName: web3Inst.toUtf8(retrievedModel[1]),
-                    owner: retrievedModel[2],
-                    description: retrievedModel[3],
-                    cost: retrievedModel[4].toNumber(),
-                    bcdbTxID: retrievedModel[5],
-                    bought: retrievedModel[6]
-                });
-            }
+            // let bought = retrievedModel[6];
+            // if (bought) {
+            //     purchasedModels.push({
+            //         modelId: id,
+            //         modelName: web3Inst.toUtf8(retrievedModel[0]),
+            //         designerName: web3Inst.toUtf8(retrievedModel[1]),
+            //         owner: retrievedModel[2],
+            //         description: retrievedModel[3],
+            //         cost: retrievedModel[4].toNumber(),
+            //         bcdbTxID: retrievedModel[5],
+            //         bought: retrievedModel[6]
+            //     });
+            // }
             models.push(
                 {
                     modelId: id,
@@ -66,39 +64,28 @@ class Models extends Component {
                     owner: retrievedModel[2],
                     description: retrievedModel[3],
                     cost: retrievedModel[4].toNumber(),
-                    bcdbTxID: retrievedModel[5],
-                    bought: retrievedModel[6]
+                    bcdbTxID: retrievedModel[5]
+                    // bought: retrievedModel[6]
                 });
         }
 
-        // for(let m = 0; m < modelCount; m++) {
-        //     let retrievedModel = await instance.getModel.call(m, {from: currentAddress});
-        //     console.log('Retrieved model:', retrievedModel);
-        //     let bought = retrievedModel[6];
-        //     if(bought)
-        //         purchasedModels.push({
-        //             modelIndex: m,
-        //             modelName:web3Inst.toUtf8(retrievedModel[0]),
-        //             designerName: web3Inst.toUtf8(retrievedModel[1]),
-        //             owner: retrievedModel[2],
-        //             description: web3Inst.toUtf8(retrievedModel[3]),
-        //             cost: retrievedModel[4].toNumber(),
-        //             bcdbTxID: retrievedModel[5],
-        //             bought: retrievedModel[6]
-        //
-        //         });
-        //     models.push(
-        //         {
-        //             modelIndex: m,
-        //             modelName:web3Inst.toUtf8(retrievedModel[0]),
-        //             designerName: web3Inst.toUtf8(retrievedModel[1]),
-        //             owner: retrievedModel[2],
-        //             description: web3Inst.toUtf8(retrievedModel[3]),
-        //             cost: retrievedModel[4].toNumber(),
-        //             bcdbTxID: retrievedModel[5],
-        //             bought: retrievedModel[6]
-        //         });
-        // }
+        let purchasedModels = [];
+        let purchasedModelIdentifiers = await instance.getPurchasedModelIds.call(currentAddress);
+        console.log("Purchased IDs: ", purchasedModelIdentifiers);
+        for(let i = 0; i< purchasedModelIdentifiers.length; ++i) {
+            let id = purchasedModelIdentifiers[i];
+            let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
+            purchasedModels.push({
+                        modelId: id,
+                        modelName: web3Inst.toUtf8(retrievedModel[0]),
+                        designerName: web3Inst.toUtf8(retrievedModel[1]),
+                        owner: retrievedModel[2],
+                        description: retrievedModel[3],
+                        cost: retrievedModel[4].toNumber(),
+                        bcdbTxID: retrievedModel[5]
+                        // bought: retrievedModel[6]
+                    });
+        }
         return new Promise(resolve => resolve([models,purchasedModels]));
     
     }
@@ -106,7 +93,7 @@ class Models extends Component {
     renderPurchasedModels() {
         let web3 = store.getState().web3.web3Instance;
         let modelsList= this.state.purchasedModels.map((model, i) => {
-            if (web3.eth.coinbase === model.owner) {
+            // if (web3.eth.coinbase === model.owner) {
                 return (
                     <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
                         <td>{model.modelName}</td>
@@ -115,16 +102,16 @@ class Models extends Component {
                         <td>{model.description}</td>
                         <td>{model.bcdbTxID}</td>
                         <td>{web3.fromWei(model.cost)}</td>
-                        <td>
-                            {web3.eth.coinbase === model.owner && model.bought &&
-                            <FileUploadButton/>
-                            }
-                        </td>
+                        {/*<td>*/}
+                            {/*{web3.eth.coinbase === model.owner &&*/}
+                            {/*<FileUploadButton/>*/}
+                            {/*}*/}
+                        {/*</td>*/}
                     </tr>
                 )
-            } else {
-                return (<tr></tr>)
-            }
+            // } else {
+            //     return (<tr></tr>)
+            // }
         }, this);
         if(this.state.purchasedModels.length) {
             return (
@@ -132,7 +119,7 @@ class Models extends Component {
                     <div className="pure-g">
                         <div className="pure-u-1-1">
                             <h1>Purchased models</h1>
-                            <p>Upload a copy of the model below:</p>
+                            <p>Models you have already bought:</p>
                         </div>
                     </div>
 
@@ -145,7 +132,6 @@ class Models extends Component {
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
                             <th>Price (ETH)</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
 
@@ -174,7 +160,6 @@ class Models extends Component {
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
                             <th>Price (ETH)</th>
-                            <th>Actions</th>
                         </tr>
                         </thead>
                     </table>
@@ -267,9 +252,9 @@ class Models extends Component {
 
         let instance = await authContract.deployed();
 
-        // let success = await instance.purchase(md.modelIndex, {from: currentAddress, value: md.cost});
-        // console.log('Bought!: ',success);
-        // return alert('Model bought successfully')
+        let success = await instance.purchase(md.modelId, {from: currentAddress, value: md.cost});
+        console.log('Bought!: ',success);
+        return alert('Model bought successfully')
     }
 
     refreshModels() {

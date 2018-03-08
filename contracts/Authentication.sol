@@ -3,26 +3,6 @@ pragma solidity ^0.4.19;
 import './zeppelin/lifecycle/Killable.sol';
 
 contract Authentication is Killable {
-    struct User {
-        bytes32 name;
-    }
-
-    mapping(address => User) private users;
-
-    struct Model {
-        bytes32 modelId;            //keccak modelname,description,bcdbTxID
-        bytes32 modelname;
-        bytes32 name;
-        address owner;
-        string description;
-        uint cost;          //in wei
-        string bcdbTxID;
-        bool bought;
-    }
-
-    bytes32[] modelIdentifiers;
-    mapping(bytes32 => Model) modelInventory;
-
     modifier onlyExistingUser {
         // Check if user exists or terminate
 
@@ -36,6 +16,33 @@ contract Authentication is Killable {
         require(!(name == 0x0));
         _;
     }
+
+    struct User {
+        bytes32 name;
+    }
+    mapping(address => User) private users;
+
+    struct Model {
+        bytes32 modelId;            //keccak(modelname,description,bcdbTxID)
+        bytes32 modelname;
+        bytes32 name;
+        address owner;
+        string description;
+        uint cost;          //in wei
+        string bcdbTxID;
+//        bool bought;
+    }
+
+    bytes32[] modelIdentifiers;
+    //modelId => model
+    mapping(bytes32 => Model) allModels;
+
+    struct PurchaseInventory {
+        //modelId => cost
+        mapping(bytes32 => uint) completedPurchases;
+    }
+    mapping(address => PurchaseInventory) purchases;
+    bytes32[] purchasedModelIds;
 
     function login() constant
     public
@@ -71,11 +78,9 @@ contract Authentication is Killable {
     onlyExistingUser
     returns (bytes32) {
         // Update user name.
-
         if (users[msg.sender].name != 0x0)
         {
             users[msg.sender].name = name;
-
             return (users[msg.sender].name);
         }
     }
@@ -89,13 +94,13 @@ contract Authentication is Killable {
         bytes32 id = keccak256(modelname,description,bcdbTxID);
         modelIdentifiers.push(id);
 
-        modelInventory[id].modelId= id;
-        modelInventory[id].modelname = modelname;
-        modelInventory[id].name = users[msg.sender].name;
-        modelInventory[id].owner = msg.sender;
-        modelInventory[id].description = description;
-        modelInventory[id].cost = cost;
-        modelInventory[id].bcdbTxID = bcdbTxID;
+        allModels[id].modelId= id;
+        allModels[id].modelname = modelname;
+        allModels[id].name = users[msg.sender].name;
+        allModels[id].owner = msg.sender;
+        allModels[id].description = description;
+        allModels[id].cost = cost;
+        allModels[id].bcdbTxID = bcdbTxID;
         return success;
     }
 
@@ -104,34 +109,36 @@ contract Authentication is Killable {
         return modelIdentifiers;
     }
 
-//    function getModelOwnerDetails(bytes32 id) public view onlyExistingUser
-//        returns(bytes32, address) {
-//        return (
-//            ;
-//    }
-
     function getModelDetails(bytes32 id) public view onlyExistingUser
-        returns (bytes32, bytes32, address, string, uint, string, bool) {
+        returns (bytes32, bytes32, address, string, uint, string) {
 
         return (
-        modelInventory[id].modelname,
-        modelInventory[id].name,
-        modelInventory[id].owner,
-        modelInventory[id].description,
-        modelInventory[id].cost,
-        modelInventory[id].bcdbTxID,
-        modelInventory[id].bought);
+        allModels[id].modelname,
+        allModels[id].name,
+        allModels[id].owner,
+        allModels[id].description,
+        allModels[id].cost,
+        allModels[id].bcdbTxID);
+//        allModels[id].bought);
     }
 
     function purchase(bytes32 id) public payable onlyExistingUser returns (bool) {
         //TODO check msg.sender balance and correct index
-        if (modelInventory[id].cost > 0) {
-            address designer = modelInventory[id].owner;
-            designer.transfer(modelInventory[id].cost);
-            modelInventory[id].bought = true;
-            //Purchase(index);
-            return true;
-        }
+        require(msg.sender.balance >= allModels[id].cost);
+        require(allModels[id].cost > 0);
 
+        purchases[msg.sender].completedPurchases[id] = msg.value;
+        purchasedModelIds.push(id);
+
+//        allModels[id].bought = true;
+        return true;
     }
+
+    function getPurchasedModelIds() public returns(bytes32[]) {
+        return purchasedModelIds;
+    }
+//    function executeTransfer(address from, address toAddr, bytes32 id) {
+//        toAddr.transfer(purchases[from].completedPurchases[id]);
+//
+//    }
 }
