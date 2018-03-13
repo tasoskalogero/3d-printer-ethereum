@@ -4,10 +4,9 @@ import AuthenticationContract from '../../../build/contracts/Authentication';
 
 const contract = require('truffle-contract');
 
-const tdStyle = {
-    width:'300px',
+const fitContent = {
+    width: '300px',
     wordWrap:'break-word',
-    display: 'inline-block'
 };
 
 class RegisteredModels extends Component {
@@ -52,7 +51,7 @@ class RegisteredModels extends Component {
         let models = [];
         for(let i = 0; i< modelIdentifiers.length; ++i) {
             let id = modelIdentifiers[i];
-            let retrievedModel = await instance.getModelDetails.call(id, {from: currentAddress});
+            let retrievedModel = await instance.getMasterModelDetails.call(id, {from: currentAddress});
             console.log('Retrieved MASTER model:', retrievedModel);
 
             models.push(
@@ -76,12 +75,12 @@ class RegisteredModels extends Component {
         let modelsList= this.state.modelsAll.map(function(model, i) {
             return(
                 <tr className={i%2===1 ? '' : 'pure-table-odd'} key={i}>
-                    <td style={tdStyle}>{model.modelId}</td>
+                    <td><div style={fitContent}>{model.modelId}</div></td>
                     <td>{model.modelName}</td>
                     <td>{model.designerName}</td>
                     <td>{model.owner}</td>
                     <td>{model.description}</td>
-                    <td style={tdStyle}>{model.bcdbTxID}</td>
+                    <td><div style={fitContent}>{model.bcdbTxID}</div></td>
                     <td>{web3.fromWei(model.cost)}</td>
                     <td>
                         <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model.modelId, model.cost)}>Buy</button>
@@ -157,7 +156,7 @@ class RegisteredModels extends Component {
 
         let instance = await authContract.deployed();
 
-        let success = await instance.purchase(mdID, {from: currentAddress, value: cost});
+        let success = await instance.newPurchase(mdID, {from: currentAddress, value: cost});
         console.log('Bought!: ',success);
         return alert('Model bought successfully')
 

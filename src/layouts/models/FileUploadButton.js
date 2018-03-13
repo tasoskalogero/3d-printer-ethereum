@@ -11,7 +11,8 @@ class FileUploadButton extends React.Component {
         super(props);
         this.state ={
             file:null,
-            model: ''
+            masterModelID: '',
+            purchaseID: ''
         };
         this.onFormSubmit = this.onFormSubmit.bind(this);
         this.onChange = this.onChange.bind(this);
@@ -20,33 +21,39 @@ class FileUploadButton extends React.Component {
     onFormSubmit(e){
         e.preventDefault();
         console.log(this.state.file);
-        this.uploadCopy(this.state.file, this.state.model);
+        this.uploadCopy();
     }
     onChange(e) {
-        this.setState({file:e.target.files[0], model:  this.props.modelToUpload})
+        this.setState({
+            file:e.target.files[0],
+            masterModelID:  this.props.masterModelID,
+            purchaseID: this.props.purchaseID})
     }
 
-    async uploadCopy(fileToUpload, modelDetails) {
+    async uploadCopy() {
 
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
-        //
         authContract.setProvider(web3Inst.currentProvider);
+
         let currentAddress = web3Inst.eth.coinbase;
         let instance = await authContract.deployed();
-        //
-        // let retrievedModel = await instance.getModelDetails.call(this.state.modelId, {from: currentAddress});
-        let modelName = modelDetails.modelName;
-        let description = modelDetails.description;
-        let cost = web3Inst.fromWei(modelDetails.cost);
 
-        console.log(modelName);
-        console.log(description);
-        console.log(cost);
+        let masterModelDetails = await instance.getMasterModelDetails.call(this.state.masterModelID, {from: currentAddress});
+
+        let copyModelName = web3Inst.toUtf8(masterModelDetails[0]) + "_Copy";
+        let copyModeldescription = masterModelDetails[3];
+        let copyModelCost = web3Inst.fromWei(masterModelDetails[4]);
+
+        console.log("UPLOAD COPY FOR: " , this.state.masterModelID);
+        console.log(copyModelName);
+        console.log(copyModeldescription);
+        console.log(copyModelCost);
 
         // Upload BCDB
-        let txID = await masterAssetBigchain(fileToUpload, modelName, description, cost, currentAddress);
-        let success = await instance.newModelCopy(modelDetails.modelId, txID, {from: currentAddress});
+        let txID = await masterAssetBigchain(this.state.file, copyModelName, copyModeldescription, copyModelCost, currentAddress);
+
+        let success = await instance.newModelCopy(this.state.masterModelID, this.state.purchaseID, txID, {from: currentAddress});
         console.log('Uploaded: ',success);
         return alert('Thank you, your model has been stored')
 

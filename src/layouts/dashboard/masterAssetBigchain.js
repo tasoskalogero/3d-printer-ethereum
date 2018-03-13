@@ -12,13 +12,6 @@ const API_PATH = 'http://78.47.44.213:8209/api/v1/';
 
 const user = new driver.Ed25519Keypair();
 
-    // console.log("STORING IN BCDB");
-    // console.log(dataPayload);
-    // console.log(mdName);
-    // console.log(mdDescr);
-    // console.log(mdCost);
-    // console.log(owner);
-
     let encryptedFile = encryptor(dataPayload);
 
 
