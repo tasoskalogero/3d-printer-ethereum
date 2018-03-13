@@ -108,14 +108,13 @@ contract Authentication is Killable {
     }
 
 
-
     //    ========================== COPY MODEL ==========================
     struct ModelCopy {
         bytes32 copyModelID;
         bytes32 masterModelID;
         bytes32 purchaseID;
         string bcdbTxID;
-        bool uploadExists;
+        bool uploaded;
         bool printed;
     }
 
@@ -133,8 +132,7 @@ contract Authentication is Killable {
         allModelsCopies[cpID].masterModelID = _masterModelID;
         allModelsCopies[cpID].purchaseID= _purchaseID;
         allModelsCopies[cpID].bcdbTxID = _bcdbTxId;
-        allModelsCopies[cpID].uploadExists = true;
-        allModelsCopies[cpID].printed = false;
+        allModelsCopies[cpID].uploaded = true;
         return true;
     }
 
@@ -145,7 +143,12 @@ contract Authentication is Killable {
 
     function getModelCopyDetails(bytes32 id) public view onlyExistingUser
     returns(bytes32, bytes32, string, bool, bool) {
-        return (allModelsCopies[id].masterModelID,allModelsCopies[id].purchaseID, allModelsCopies[id].bcdbTxID,allModelsCopies[id].uploadExists, allModelsCopies[id].printed);
+        return (allModelsCopies[id].masterModelID,allModelsCopies[id].purchaseID, allModelsCopies[id].bcdbTxID,allModelsCopies[id].uploaded, allModelsCopies[id].printed);
+    }
+
+    function setCopyModelPrinted(bytes32 cmID) public {
+        require(msg.sender == 0x821aea9a577a9b44299b9c15c88cf3087f3b5544);        //only printer can change it
+        allModelsCopies[cmID].printed = true;
     }
 
     //    ========================== PURCHASE ==========================
@@ -186,7 +189,8 @@ contract Authentication is Killable {
         return purchases[pID].completedPurchases[mID];
     }
 
-    function executeTransfer(bytes32 pID, bytes32 mID, address owner) public returns(bool success){
+    function executeTransfer(bytes32 cmID, bytes32 pID, bytes32 mID, address owner) public returns(bool success){
+
         owner.transfer(purchases[pID].completedPurchases[mID]);
         return true;
     }

@@ -70,7 +70,7 @@ class UploadedCopies extends Component {
                     {currentAddress.toUpperCase() === PRINTER.toUpperCase() ?
                         (<td>
                             <button className="pure-button pure-button-primary"
-                                    onClick={() => this.handlePrint(model.masterModelID, model.purchaseID)}>Print
+                                    onClick={() => this.handlePrint(model.copyModelID, model.masterModelID, model.purchaseID)}>Print
                             </button>
                         </td>):(<td></td>)}
                 </tr>
@@ -146,7 +146,7 @@ class UploadedCopies extends Component {
 
     }
 
-    async handlePrint(masterModelID, purchaseID) {
+    async handlePrint(copyModelID, masterModelID, purchaseID) {
         console.log("Printing.... ");
 
         let web3Inst = store.getState().web3.web3Instance;
@@ -155,14 +155,11 @@ class UploadedCopies extends Component {
         let currentAddress = web3Inst.eth.coinbase;
         let instance = await authContract.deployed();
 
-        let purchaseDetails = await instance.getPurchaseByID.call(purchaseID, {from: currentAddress});
-        let buyer = purchaseDetails[0];
 
-        let cost = await instance.getPurchaseCost.call(purchaseID, masterModelID, {from: currentAddress});
         let masterModelDetails = await instance.getMasterModelDetails.call(masterModelID, {from: currentAddress});
         let owner = masterModelDetails[2];
 
-        let success = await instance.executeTransfer(purchaseID, masterModelID, owner, {from: currentAddress});
+        let success = await instance.executeTransfer(copyModelID, purchaseID, masterModelID, owner, {from: currentAddress});
 
         // let retrievedModel = await instance.getModelDetails.call(masterModelID, {from: currentAddress});
         // let owner = retrievedModel[2];
@@ -173,6 +170,7 @@ class UploadedCopies extends Component {
         console.log("Purchase comleted: ", success);
         return alert('Purchase comleted successfully')
     }
+
 }
 
 export default UploadedCopies

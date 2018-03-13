@@ -20,6 +20,13 @@ class PurchasedModels extends Component {
     }
 
     componentWillMount() {
+        // this.getCopyModels()
+        //     .then(result => {
+        //         this.setState ({
+        //             copyModelStatus: result
+        //         });
+        //     });
+
         this.getModels()
             .then(result => {
                 this.setState ({
@@ -27,6 +34,27 @@ class PurchasedModels extends Component {
                 });
             });
     }
+
+    // async getCopyModels() {
+    //     let web3Inst = store.getState().web3.web3Instance;
+    //     const authContract = contract(AuthenticationContract);
+    //     authContract.setProvider(web3Inst.currentProvider);
+    //
+    //     let currentAddress = web3Inst.eth.coinbase;
+    //     let instance = await authContract.deployed();
+    //
+    //     let copyStatus = {};
+    //     let copyModelIDs = await instance.getModelCopyIdentifiers.call();
+    //     for(let i = 0; i< copyModelIDs.length; ++i) {
+    //         let cID = copyModelIDs[i];
+    //         let copyModelStatus = await instance.getModelCopyDetails.call(cID,{from: currentAddress});
+    //         let uploaded = copyModelStatus[3];
+    //         copyStatus[cID] = uploaded;
+    //     }
+    //     console.log("----------------- ", copyStatus);
+    //     return new Promise(resolve => resolve(copyStatus));
+    // }
+
 
     async getModels() {
         let web3Inst = store.getState().web3.web3Instance;
@@ -47,9 +75,7 @@ class PurchasedModels extends Component {
             console.log(pID);
             let purchaseDetails = await instance.getPurchaseByID.call(pID,{from: currentAddress});
             let buyer = purchaseDetails[0];
-            console.log("--- ", buyer);
             let purchaseModelIDs = purchaseDetails[1];
-            console.log("=== ", purchaseModelIDs);
             for(let mID = 0; mID < purchaseModelIDs.length; mID++) {
                 let masterModelDetails = await instance.getMasterModelDetails.call(purchaseModelIDs[mID], {from: currentAddress});
                 console.log(masterModelDetails);
@@ -75,7 +101,7 @@ class PurchasedModels extends Component {
                         <td><div style={fitContent}>{purchase.masterModelID}</div></td>
                         <td>{purchase.buyer}</td>
                         <td>{purchase.owner}</td>
-                        {currentAddress === purchase.owner ?
+                        {currentAddress === purchase.owner?
                             (<td><FileUploadButton purchaseID={purchase.purchaseID} masterModelID={purchase.masterModelID}/></td>) : (<td></td>)
                         }
                     </tr>
