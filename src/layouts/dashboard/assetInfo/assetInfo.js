@@ -39,9 +39,9 @@ class AssetInfo extends Component {
     event.preventDefault();
     let web3 = store.getState().web3.web3Instance;
     let owner = web3.eth.coinbase;
-      let txID = await masterAssetBigchain(this.state.uploadedFile, this.state.modelname, this.state.description, this.state.cost, owner);
-      this.setState({bcdbTxID: txID});
-      this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID)
+    let txID = await masterAssetBigchain(this.state.uploadedFile, this.state.modelname, this.state.description, web3.toWei(this.state.cost), owner);
+    this.setState({bcdbTxID: txID});
+    this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID)
   }
 
     uploadFileCallback = (dataFromFileUpload) => {

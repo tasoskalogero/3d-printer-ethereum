@@ -169,9 +169,9 @@ contract Authentication is Killable {
         return purchasedModelIds;
     }
 
-    function executeTransfer(address from, address toAddr, bytes32 id) public returns(bool){
-        toAddr.transfer(purchases[from].completedPurchases[id]);
+    function executeTransfer(address buyer, address owner, bytes32 id) public returns(bool success){
+        owner.transfer(purchases[buyer].completedPurchases[id]);
         return true;
-
     }
+
 }

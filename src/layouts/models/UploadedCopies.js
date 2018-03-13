@@ -146,11 +146,11 @@ class UploadedCopies extends Component {
         // Log errors, if any.
         let instance = await authContract.deployed();
         let retrievedModel = await instance.getModelDetails.call(masterModelID, {from: currentAddress});
-        let buyer = retrievedModel[2];
-        let owner = retrievedModel[6];
-        console.log(buyer);
-        console.log(owner);
-        let success = await instance.executeTransfer.call(buyer, owner, masterModelID, {from: currentAddress});
+        let owner = retrievedModel[2];
+        let buyer = retrievedModel[6];
+        console.log("Owner: ", owner);
+        console.log("Buyer: " ,buyer);
+        let success = await instance.executeTransfer(buyer, owner, masterModelID, {from: currentAddress});
         console.log("Purchase comleted: ", success);
         return alert('Purchase comleted successfully')
     }

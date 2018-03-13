@@ -3,7 +3,7 @@ import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
 import masterAssetBigchain from "../dashboard/masterAssetBigchain";
 
-const contract = require('truffle-contract')
+const contract = require('truffle-contract');
 
 class FileUploadButton extends React.Component {
 
@@ -38,7 +38,7 @@ class FileUploadButton extends React.Component {
         // let retrievedModel = await instance.getModelDetails.call(this.state.modelId, {from: currentAddress});
         let modelName = modelDetails.modelName;
         let description = modelDetails.description;
-        let cost = modelDetails.cost;
+        let cost = web3Inst.fromWei(modelDetails.cost);
 
         console.log(modelName);
         console.log(description);
