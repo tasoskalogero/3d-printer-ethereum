@@ -93,7 +93,7 @@ class RegisteredModels extends Component {
                     <div className="pure-g">
                         <div className="pure-u-1-1">
                             <h1>Available models</h1>
-                            <p>List with the available models:</p>
+                            <p>List with available models:</p>
                         </div>
                     </div>
 

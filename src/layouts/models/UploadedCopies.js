@@ -62,20 +62,30 @@ class UploadedCopies extends Component {
         let web3 = store.getState().web3.web3Instance;
         let currentAddress = web3.eth.coinbase;
         let copyModelsList= this.state.uploadedCopies.map((model, i) => {
-            return (
-                <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
-                    <td><div style={fitContent}>{model.copyModelID}</div></td>
-                    <td><div style={fitContent}>{model.masterModelID}</div></td>
-                    <td><div style={fitContent}>{model.purchaseID}</div></td>
-                    <td><div style={fitContent}>{model.bcdbTxID}</div></td>
-                    {currentAddress.toUpperCase() === PRINTER.toUpperCase() && !model.printed ?
-                        (<td>
-                            <button className="pure-button pure-button-primary"
-                                    onClick={() => this.handlePrint(model.copyModelID, model.masterModelID, model.purchaseID)}>Print
-                            </button>
-                        </td>):(<td></td>)}
-                </tr>
-            )
+            if(currentAddress.toUpperCase() === PRINTER.toUpperCase() ) {
+                return (
+                    <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
+                        <td>
+                            <div style={fitContent}>{model.copyModelID}</div>
+                        </td>
+                        <td>
+                            <div style={fitContent}>{model.masterModelID}</div>
+                        </td>
+                        <td>
+                            <div style={fitContent}>{model.purchaseID}</div>
+                        </td>
+                        <td>
+                            <div style={fitContent}>{model.bcdbTxID}</div>
+                        </td>
+                        {!model.printed ?
+                            (<td>
+                                <button className="pure-button pure-button-primary"
+                                        onClick={() => this.handlePrint(model.copyModelID, model.masterModelID, model.purchaseID)}>Print
+                                </button>
+                            </td>) : (<td></td>)}
+                    </tr>
+                )
+            }
         }, this);
         if(this.state.uploadedCopies.length) {
             return (

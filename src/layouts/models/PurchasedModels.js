@@ -68,6 +68,7 @@ class PurchasedModels extends Component {
         let web3 = store.getState().web3.web3Instance;
         let currentAddress = web3.eth.coinbase;
         let purchasesList= this.state.purchases.map((purchase, i) => {
+            if(purchase.buyer === currentAddress || currentAddress === purchase.owner) {
                 return (
                     <tr className={i % 2 === 1 ? '' : 'pure-table-odd'} key={i}>
                         <td> <div style={fitContent}>{purchase.purchaseID}</div></td>
@@ -80,6 +81,7 @@ class PurchasedModels extends Component {
                         }
                     </tr>
                 )
+            }
         }, this);
         if(this.state.purchases.length) {
             return (

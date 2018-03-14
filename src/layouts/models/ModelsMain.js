@@ -7,18 +7,13 @@ class Models extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            updatePurchases: false
-        };
     }
 
     render() {
         return (
             <div>
                 <RegisteredModels/>
-                <br/>
                 <PurchasedModels/>
-                <br/>
                 <UploadedCopies/>
             </div>
         )
