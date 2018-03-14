@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import FileUpload from './FileUpload'
 import AssetInfoContainer from './assetInfo/assetInfoContainer';
 
 class Dashboard extends Component {

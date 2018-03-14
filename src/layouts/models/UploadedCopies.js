@@ -73,7 +73,7 @@ class UploadedCopies extends Component {
                             <button className="pure-button pure-button-primary"
                                     onClick={() => this.handlePrint(model.copyModelID, model.masterModelID, model.purchaseID)}>Print
                             </button>
-                        </td>):(<td>Printed</td>)}
+                        </td>):(<td></td>)}
                 </tr>
             )
         }, this);

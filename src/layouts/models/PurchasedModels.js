@@ -76,7 +76,7 @@ class PurchasedModels extends Component {
                         <td>{purchase.owner}</td>
                         {currentAddress === purchase.owner && !purchase.uploaded?
                             (<td><FileUploadButton purchaseID={purchase.purchaseID} masterModelID={purchase.masterModelID}/></td>)
-                            : (<td>Uploaded</td>)
+                            : (<td></td>)
                         }
                     </tr>
                 )
