@@ -15,8 +15,10 @@ class PurchasedModels extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            purchases: []
+            purchases: [],
+            status:''
         };
+        this.handleNewCopyUpload = this.handleNewCopyUpload.bind(this);
     }
 
     componentWillMount() {
@@ -61,6 +63,10 @@ class PurchasedModels extends Component {
 
     }
 
+    handleNewCopyUpload () {
+        this.refreshModels();
+    };
+
     renderPurchases() {
         let web3 = store.getState().web3.web3Instance;
         let currentAddress = web3.eth.coinbase;
@@ -73,7 +79,7 @@ class PurchasedModels extends Component {
                         <td>{purchase.buyer}</td>
                         <td>{purchase.owner}</td>
                         {currentAddress === purchase.owner && !purchase.uploaded?
-                            (<td><FileUploadButton purchaseID={purchase.purchaseID} masterModelID={purchase.masterModelID}/></td>)
+                            (<td><FileUploadButton onNewCopyUpload={this.handleNewCopyUpload} purchaseID={purchase.purchaseID} masterModelID={purchase.masterModelID}/></td>)
                             : (<td></td>)
                         }
                     </tr>
@@ -85,7 +91,7 @@ class PurchasedModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Purchases</h1>
+                            <h1>Purchases</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -111,7 +117,7 @@ class PurchasedModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Purchases</h1>
+                            <h1>Purchases</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -132,20 +138,23 @@ class PurchasedModels extends Component {
     }
     refreshModels() {
         console.log("Refreshing models");
-        this.getPurchases()
-            .then(result => {
-                this.setState ({
-                    purchases: result
+        this.setState({status:'Refreshing purchases...Please wait'});
+        setTimeout(function() {
+            this.getPurchases()
+                .then(result => {
+                    this.setState ({
+                        purchases: result,
+                        status:''
+                    });
                 });
-            });
+        }.bind(this), 7000);
     }
 
     render() {
             return (
                 <div>
                     {this.renderPurchases()}
-                    <p>Please click the Refresh  button if the entry doesn't appear above.</p>
-                    <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
+                    {/*<button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>*/}
                 </div>
             )
 

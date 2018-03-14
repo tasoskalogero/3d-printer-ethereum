@@ -158,6 +158,7 @@ class RegisteredModels extends Component {
         let instance = await authContract.deployed();
 
         let success = await instance.newPurchase(mdID, {from: currentAddress, value: cost});
+        this.props.onNewPurchase();
         return alert('Model bought successfully')
 
     }

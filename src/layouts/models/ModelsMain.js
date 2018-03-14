@@ -7,13 +7,18 @@ class Models extends Component {
 
     constructor(props) {
         super(props);
+        this.handleNewPurchase = this.handleNewPurchase.bind(this);
     }
+
+    handleNewPurchase () {
+        this.refs.purchasesComponent.refreshModels();
+    };
 
     render() {
         return (
             <div>
-                <RegisteredModels/>
-                <PurchasedModels/>
+                <RegisteredModels onNewPurchase={this.handleNewPurchase}/>
+                <PurchasedModels ref="purchasesComponent"/>
                 <UploadedCopies/>
             </div>
         )

@@ -15,7 +15,8 @@ class UploadedCopies extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            uploadedCopies: []
+            uploadedCopies: [],
+            status:''
         };
     }
 
@@ -91,7 +92,7 @@ class UploadedCopies extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Uploaded copies</h1>
+                            <h1>Uploaded copies</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -117,7 +118,7 @@ class UploadedCopies extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Uploaded copies</h1>
+                            <h1>Uploaded copies</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -138,12 +139,16 @@ class UploadedCopies extends Component {
     }
     refreshModels() {
         console.log("Refreshing models");
-        this.getModels()
-            .then(result => {
-                this.setState ({
-                    uploadedCopies: result
+        this.setState({status:'Refreshing...Please wait'});
+        setTimeout(function() {
+            this.getModels()
+                .then(result => {
+                    this.setState ({
+                        uploadedCopies: result,
+                        status:''
+                    });
                 });
-            });
+        }.bind(this), 7000);
     }
 
     render() {
@@ -171,7 +176,7 @@ class UploadedCopies extends Component {
         let owner = masterModelDetails[2];
 
         let success = await instance.executeTransfer(copyModelID, purchaseID, owner, {from: currentAddress});
-
+        this.refreshModels();
         return alert('Purchase comleted successfully')
     }
 
