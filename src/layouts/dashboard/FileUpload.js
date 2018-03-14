@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import DropzoneComponent from 'react-dropzone-component';
-import masterAssetBigchain from './masterAssetBigchain';
 require('./dropzone.css');
 require('./filepicker.css');
 require('./dropzone.min.css');
