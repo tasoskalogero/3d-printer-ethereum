@@ -54,7 +54,7 @@ class FileUploadButton extends React.Component {
         let txID = await masterAssetBigchain(this.state.file, copyModelName, copyModeldescription, copyModelCost, currentAddress);
 
         let success = await instance.newModelCopy(this.state.masterModelID, this.state.purchaseID, txID, {from: currentAddress});
-        console.log('Uploaded: ',success);
+        // console.log('Uploaded: ',success);
         return alert('Thank you, your model has been stored')
 
     }

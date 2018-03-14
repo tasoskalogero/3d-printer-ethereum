@@ -20,14 +20,7 @@ class PurchasedModels extends Component {
     }
 
     componentWillMount() {
-        // this.getCopyModels()
-        //     .then(result => {
-        //         this.setState ({
-        //             copyModelStatus: result
-        //         });
-        //     });
-
-        this.getModels()
+        this.getPurchases()
             .then(result => {
                 this.setState ({
                     purchases: result
@@ -35,28 +28,7 @@ class PurchasedModels extends Component {
             });
     }
 
-    // async getCopyModels() {
-    //     let web3Inst = store.getState().web3.web3Instance;
-    //     const authContract = contract(AuthenticationContract);
-    //     authContract.setProvider(web3Inst.currentProvider);
-    //
-    //     let currentAddress = web3Inst.eth.coinbase;
-    //     let instance = await authContract.deployed();
-    //
-    //     let copyStatus = {};
-    //     let copyModelIDs = await instance.getModelCopyIdentifiers.call();
-    //     for(let i = 0; i< copyModelIDs.length; ++i) {
-    //         let cID = copyModelIDs[i];
-    //         let copyModelStatus = await instance.getModelCopyDetails.call(cID,{from: currentAddress});
-    //         let uploaded = copyModelStatus[3];
-    //         copyStatus[cID] = uploaded;
-    //     }
-    //     console.log("----------------- ", copyStatus);
-    //     return new Promise(resolve => resolve(copyStatus));
-    // }
-
-
-    async getModels() {
+    async getPurchases() {
         let web3Inst = store.getState().web3.web3Instance;
         const authContract = contract(AuthenticationContract);
         authContract.setProvider(web3Inst.currentProvider);
@@ -68,24 +40,25 @@ class PurchasedModels extends Component {
 
         let purchases = [];
         let purchaseIdentifiers = await instance.getPurchaseIDs.call();
-        console.log("Number of PURCHASED models found: ",purchaseIdentifiers.length);
+        console.log("Number of PURCHASES found: ",purchaseIdentifiers.length);
 
         for(let i = 0; i< purchaseIdentifiers.length; ++i) {
             let pID = purchaseIdentifiers[i];
-            console.log(pID);
+
             let purchaseDetails = await instance.getPurchaseByID.call(pID,{from: currentAddress});
             let buyer = purchaseDetails[0];
-            let purchaseModelIDs = purchaseDetails[1];
-            for(let mID = 0; mID < purchaseModelIDs.length; mID++) {
-                let masterModelDetails = await instance.getMasterModelDetails.call(purchaseModelIDs[mID], {from: currentAddress});
-                console.log(masterModelDetails);
-                purchases.push({
-                    purchaseID: pID,
-                    masterModelID: purchaseModelIDs[mID],
-                    buyer: buyer,
-                    owner: masterModelDetails[2]
-                })
-            }
+            let owner = purchaseDetails[1];
+            let masterModelID = purchaseDetails[2];
+            // let cost = web3Inst.fromWei(purchaseDetails[3]);
+            let uploaded = purchaseDetails[4];
+            // let initialized = purchaseDetails[5];
+            purchases.push({
+                purchaseID: pID,
+                masterModelID: masterModelID,
+                buyer: buyer,
+                owner: owner,
+                uploaded: uploaded,
+            })
         }
         return new Promise(resolve => resolve(purchases));
 
@@ -101,7 +74,7 @@ class PurchasedModels extends Component {
                         <td><div style={fitContent}>{purchase.masterModelID}</div></td>
                         <td>{purchase.buyer}</td>
                         <td>{purchase.owner}</td>
-                        {currentAddress === purchase.owner?
+                        {currentAddress === purchase.owner && !purchase.uploaded?
                             (<td><FileUploadButton purchaseID={purchase.purchaseID} masterModelID={purchase.masterModelID}/></td>) : (<td></td>)
                         }
                     </tr>
@@ -159,7 +132,7 @@ class PurchasedModels extends Component {
     }
     refreshModels() {
         console.log("Refreshing models");
-        this.getModels()
+        this.getPurchases()
             .then(result => {
                 this.setState ({
                     purchases: result

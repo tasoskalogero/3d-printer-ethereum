@@ -114,7 +114,7 @@ contract Authentication is Killable {
         bytes32 masterModelID;
         bytes32 purchaseID;
         string bcdbTxID;
-        bool uploaded;
+//        bool uploaded;
         bool printed;
     }
 
@@ -125,14 +125,16 @@ contract Authentication is Killable {
 
     function newModelCopy(bytes32 _masterModelID, bytes32 _purchaseID, string _bcdbTxId) public returns(bool success){
 
-        bytes32 cpID = keccak256(_masterModelID,_bcdbTxId);
+        bytes32 cpID = keccak256(_masterModelID,_bcdbTxId); //maybe add "now"
         modelCopyIdentifiers.push(cpID );
 
         allModelsCopies[cpID].copyModelID = cpID;
         allModelsCopies[cpID].masterModelID = _masterModelID;
         allModelsCopies[cpID].purchaseID= _purchaseID;
         allModelsCopies[cpID].bcdbTxID = _bcdbTxId;
-        allModelsCopies[cpID].uploaded = true;
+        allModelsCopies[cpID].printed = false;
+
+        purchases[_purchaseID].uploaded = true;
         return true;
     }
 
@@ -142,11 +144,12 @@ contract Authentication is Killable {
     }
 
     function getModelCopyDetails(bytes32 id) public view onlyExistingUser
-    returns(bytes32, bytes32, string, bool, bool) {
-        return (allModelsCopies[id].masterModelID,allModelsCopies[id].purchaseID, allModelsCopies[id].bcdbTxID,allModelsCopies[id].uploaded, allModelsCopies[id].printed);
+    returns(bytes32, bytes32, string, bool) {
+        return (allModelsCopies[id].masterModelID,allModelsCopies[id].purchaseID, allModelsCopies[id].bcdbTxID, allModelsCopies[id].printed);
     }
 
     function setCopyModelPrinted(bytes32 cmID) public {
+        //TODO list with registered printers maybe?
         require(msg.sender == 0x821aea9a577a9b44299b9c15c88cf3087f3b5544);        //only printer can change it
         allModelsCopies[cmID].printed = true;
     }
@@ -155,9 +158,11 @@ contract Authentication is Killable {
 
     struct PurchaseInventory {
         address buyer;
-        //masterModelId => cost
-        mapping(bytes32 => uint) completedPurchases;
-        bytes32[] masterModelIDs;
+        address owner;
+        bytes32 masterModelID;
+        uint cost;
+        bool uploaded;
+        bool initialized;
     }
 
     bytes32[] purchaseIDs;
@@ -165,15 +170,19 @@ contract Authentication is Killable {
     mapping(bytes32 => PurchaseInventory) purchases;
 
 
-    function newPurchase(bytes32 masterModelID) public payable onlyExistingUser returns (bool) {
-        require(msg.sender.balance >= masterModels[masterModelID].cost);
-        require(masterModels[masterModelID].cost > 0);
+    function newPurchase(bytes32 _masterModelID) public payable onlyExistingUser returns (bool) {
+        require(msg.sender.balance >= masterModels[_masterModelID].cost);
+        require(masterModels[_masterModelID].cost > 0);
 
-        bytes32 purchaseID = keccak256(masterModelID,msg.sender);
+        bytes32 purchaseID = keccak256(_masterModelID,msg.sender, now);
         purchaseIDs.push(purchaseID);
-        purchases[purchaseID].masterModelIDs.push(masterModelID);
+
         purchases[purchaseID].buyer = msg.sender;
-        purchases[purchaseID].completedPurchases[masterModelID] = msg.value;
+        purchases[purchaseID].owner = masterModels[_masterModelID].owner;
+        purchases[purchaseID].masterModelID = _masterModelID;
+        purchases[purchaseID].cost = msg.value;
+        purchases[purchaseID].uploaded = false;
+        purchases[purchaseID].initialized = true;
         return true;
     }
 
@@ -181,18 +190,20 @@ contract Authentication is Killable {
         return purchaseIDs;
     }
 
-    function getPurchaseByID(bytes32 pID) public returns(address, bytes32[]) {
-        return(purchases[pID].buyer,purchases[pID].masterModelIDs);
+    function getPurchaseByID(bytes32 pID) public returns(address, address, bytes32, uint, bool, bool) {
+        return(
+        purchases[pID].buyer,
+        purchases[pID].owner,
+        purchases[pID].masterModelID,
+        purchases[pID].cost,
+        purchases[pID].uploaded,
+        purchases[pID].initialized);
     }
 
-    function getPurchaseCost(bytes32 pID, bytes32 mID) public returns(uint) {
-        return purchases[pID].completedPurchases[mID];
-    }
-
-    function executeTransfer(bytes32 cmID, bytes32 pID, bytes32 mID, address owner) public returns(bool success){
-
-        owner.transfer(purchases[pID].completedPurchases[mID]);
-        return true;
-    }
+//    function executeTransfer(bytes32 cmID, bytes32 pID, bytes32 mID, address owner) public returns(bool success){
+//
+//        owner.transfer(purchases[pID].completedPurchases[mID]);
+//        return true;
+//    }
 
 }
