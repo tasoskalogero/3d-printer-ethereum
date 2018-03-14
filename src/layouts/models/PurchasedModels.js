@@ -35,7 +35,6 @@ class PurchasedModels extends Component {
 
         let currentAddress = web3Inst.eth.coinbase;
 
-        // Log errors, if any.
         let instance = await authContract.deployed();
 
         let purchases = [];
@@ -49,9 +48,7 @@ class PurchasedModels extends Component {
             let buyer = purchaseDetails[0];
             let owner = purchaseDetails[1];
             let masterModelID = purchaseDetails[2];
-            // let cost = web3Inst.fromWei(purchaseDetails[3]);
             let uploaded = purchaseDetails[4];
-            // let initialized = purchaseDetails[5];
             purchases.push({
                 purchaseID: pID,
                 masterModelID: masterModelID,
@@ -147,6 +144,7 @@ class PurchasedModels extends Component {
             return (
                 <div>
                     {this.renderPurchases()}
+                    <p>Please click the Refresh  button if the entry doesn't appear above.</p>
                     <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
                 </div>
             )

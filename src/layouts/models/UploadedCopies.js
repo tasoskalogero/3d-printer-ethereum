@@ -35,7 +35,6 @@ class UploadedCopies extends Component {
 
         let currentAddress = web3Inst.eth.coinbase;
 
-        // Log errors, if any.
         let instance = await authContract.deployed();
 
         let purchasedModels = [];
@@ -151,6 +150,7 @@ class UploadedCopies extends Component {
             return (
                 <div>
                     {this.renderCopyModels()}
+                    <p>Please click the Refresh button if the entry doesn't appear above.</p>
                     <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
                 </div>
             )

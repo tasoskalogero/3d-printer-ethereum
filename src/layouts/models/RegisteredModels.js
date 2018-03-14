@@ -43,7 +43,7 @@ class RegisteredModels extends Component {
 
         let currentAddress = web3Inst.eth.coinbase;
 
-        // Log errors, if any.
+
         let instance = await authContract.deployed();
         let modelIdentifiers = await instance.getModelIdentifiers.call();
 
