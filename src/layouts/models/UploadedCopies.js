@@ -50,7 +50,8 @@ class UploadedCopies extends Component {
                         copyModelID: id,
                         masterModelID: modelCopyDetails[0],
                         purchaseID: modelCopyDetails[1],
-                        bcdbTxID: modelCopyDetails[2]
+                        bcdbTxID: modelCopyDetails[2],
+                        printed: modelCopyDetails[3]
                     });
         }
         return new Promise(resolve => resolve(purchasedModels));
@@ -67,12 +68,12 @@ class UploadedCopies extends Component {
                     <td><div style={fitContent}>{model.masterModelID}</div></td>
                     <td><div style={fitContent}>{model.purchaseID}</div></td>
                     <td><div style={fitContent}>{model.bcdbTxID}</div></td>
-                    {currentAddress.toUpperCase() === PRINTER.toUpperCase() ?
+                    {currentAddress.toUpperCase() === PRINTER.toUpperCase() && !model.printed ?
                         (<td>
                             <button className="pure-button pure-button-primary"
                                     onClick={() => this.handlePrint(model.copyModelID, model.masterModelID, model.purchaseID)}>Print
                             </button>
-                        </td>):(<td></td>)}
+                        </td>):(<td>Printed</td>)}
                 </tr>
             )
         }, this);
@@ -159,15 +160,8 @@ class UploadedCopies extends Component {
         let masterModelDetails = await instance.getMasterModelDetails.call(masterModelID, {from: currentAddress});
         let owner = masterModelDetails[2];
 
-        let success = await instance.executeTransfer(copyModelID, purchaseID, masterModelID, owner, {from: currentAddress});
+        let success = await instance.executeTransfer(copyModelID, purchaseID, owner, {from: currentAddress});
 
-        // let retrievedModel = await instance.getModelDetails.call(masterModelID, {from: currentAddress});
-        // let owner = retrievedModel[2];
-        // let buyer = retrievedModel[6];
-        // console.log("Owner: ", owner);
-        // console.log("Buyer: " ,buyer);
-        // let success = await instance.executeTransfer(buyer, owner, masterModelID, {from: currentAddress});
-        console.log("Purchase comleted: ", success);
         return alert('Purchase comleted successfully')
     }
 

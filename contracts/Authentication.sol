@@ -200,10 +200,10 @@ contract Authentication is Killable {
         purchases[pID].initialized);
     }
 
-//    function executeTransfer(bytes32 cmID, bytes32 pID, bytes32 mID, address owner) public returns(bool success){
-//
-//        owner.transfer(purchases[pID].completedPurchases[mID]);
-//        return true;
-//    }
+    function executeTransfer(bytes32 cmID, bytes32 pID, address owner) public returns(bool success){
+        owner.transfer(purchases[pID].cost);
+        allModelsCopies[cmID].printed = true;
+        return true;
+    }
 
 }
