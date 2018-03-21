@@ -11,7 +11,7 @@ function modelUpdated(model) {
   }
 }
 
-export function updateValues(modelname, description, cost, bcdbTxID) {
+export function updateValues(modelname, description, cost, bcdbTxID, checksum) {
   let web3 = store.getState().web3.web3Instance;
 
   // Double-check web3's status.
@@ -23,7 +23,7 @@ export function updateValues(modelname, description, cost, bcdbTxID) {
       authentication.setProvider(web3.currentProvider);
 
       // Declaring this for later so we can chain functions on Authentication.
-      var authenticationInstance;
+      let authenticationInstance;
 
       // Get current ethereum wallet.
       web3.eth.getCoinbase((error, coinbase) => {
@@ -34,17 +34,13 @@ export function updateValues(modelname, description, cost, bcdbTxID) {
 
         authentication.deployed().then(function(instance) {
         authenticationInstance = instance;
-                    // Attempt to login user.
-
-          
-          authenticationInstance.newModel(modelname, description, web3.toWei(cost), bcdbTxID, {from: coinbase, gas: 3000000, value:300})
+        authenticationInstance.newModel(modelname, description, web3.toWei(cost), bcdbTxID, checksum, {from: coinbase, gas: 3000000, value:300})
           .then(function(result) {
 
             dispatch(modelUpdated({"modelname":modelname, "description":description, "cost": cost}));
             
             console.log(result);
             return alert('Thank you, your model has been stored')
-            
 
           })
           .catch(function(result) {

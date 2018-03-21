@@ -12,18 +12,16 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onAssetFormSubmit: (modelname, description, cost, bcdbTxID) => {
+    onAssetFormSubmit: (modelname, description, cost, bcdbTxID, checksum) => {
       
-      //event.preventDefault();
-
-      dispatch(updateValues(modelname, description, cost, bcdbTxID))
+      dispatch(updateValues(modelname, description, cost, bcdbTxID, checksum))
     }
   }
-}
+};
 
 const AssetInfoContainer = connect(
   mapStateToProps,
   mapDispatchToProps
-)(AssetInfo)
+)(AssetInfo);
 
 export default AssetInfoContainer

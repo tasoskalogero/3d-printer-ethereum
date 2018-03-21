@@ -2,6 +2,7 @@ import React from 'react'
 import store from "../../store";
 import AuthenticationContract from '../../../build/contracts/Authentication';
 import masterAssetBigchain from "../dashboard/masterAssetBigchain";
+import generateCS from "./ChecksumGenerator";
 
 const contract = require('truffle-contract');
 
@@ -18,11 +19,23 @@ class FileUploadButton extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
-    onFormSubmit(e){
+    async onFormSubmit(e){
         e.preventDefault();
+        let web3Inst = store.getState().web3.web3Instance;
+        const authContract = contract(AuthenticationContract);
+        authContract.setProvider(web3Inst.currentProvider);
+        let currentAddress = web3Inst.eth.coinbase;
+        let instance = await authContract.deployed();
+
         if(this.state.file === null)
             return alert("File is missing");
-        console.log(this.state.file);
+
+        let checksum = await generateCS(this.state.file);
+        let masterModel = await instance.getMasterModelDetails.call(this.state.masterModelID, {from: currentAddress});
+        let masterChecksum = masterModel[6];
+        if (masterChecksum !== checksum)
+            return alert("Wrong checksum.");
+
         this.uploadCopy();
     }
     onChange(e) {
@@ -54,6 +67,7 @@ class FileUploadButton extends React.Component {
             return alert("BigchainDB error - " + result[1]);
         }
         let txID = result[1];
+
         let success = await instance.newModelCopy(this.state.masterModelID, this.state.purchaseID, txID, {from: currentAddress});
         this.props.onNewCopyUpload();
         return alert('Thank you, your model has been stored')

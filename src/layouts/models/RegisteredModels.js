@@ -67,7 +67,8 @@ class RegisteredModels extends Component {
                     owner: retrievedModel[2],
                     description: retrievedModel[3],
                     cost: retrievedModel[4].toNumber(),
-                    bcdbTxID: retrievedModel[5]
+                    bcdbTxID: retrievedModel[5],
+                    checksum: retrievedModel[6]
                 });
         }
 
@@ -83,9 +84,10 @@ class RegisteredModels extends Component {
                     <td><div style={fitContent}>{model.modelId}</div></td>
                     <td>{model.modelName}</td>
                     <td>{model.designerName}</td>
-                    <td>{model.owner}</td>
+                    <td><div style={fitContent}>{model.owner}</div></td>
                     <td>{model.description}</td>
                     <td><div style={fitContent}>{model.bcdbTxID}</div></td>
+                    <td><div style={fitContent}>{model.checksum}</div></td>
                     <td>{web3.fromWei(model.cost)}</td>
                     <td>
                         <button className="pure-button pure-button-primary" onClick={() => this.handleBuy(model.modelId, model.cost)}>Buy</button>
@@ -110,6 +112,7 @@ class RegisteredModels extends Component {
                             <th>Owner's Address</th>
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
+                            <th>Checksum</th>
                             <th>Price (ETH)</th>
                             <th>Actions</th>
                         </tr>
@@ -139,6 +142,7 @@ class RegisteredModels extends Component {
                             <th>Owner's Address</th>
                             <th>Description</th>
                             <th>BigchainDB TxID</th>
+                            <th>Checksum</th>
                             <th>Price (ETH)</th>
                             <th>Actions</th>
                         </tr>

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import FileUpload from '../FileUpload'
 import masterAssetBigchain from '../masterAssetBigchain';
 import store from "../../../store";
+import generateCS from '../../models/ChecksumGenerator';
 
 class AssetInfo extends Component {
   constructor(props, {authData}) {
@@ -49,12 +50,14 @@ class AssetInfo extends Component {
     if(this.state.cost === '')
         return alert("Cost is missing");
 
+    let checksum = await generateCS(this.state.uploadedFile);
+
     let result = await masterAssetBigchain(this.state.uploadedFile, this.state.modelname, this.state.description, web3.toWei(this.state.cost), owner);
     if(result[0] === 1) {
         return alert("BigchainDB error - " + result[1]);
     }
     this.setState({bcdbTxID: result[1]});
-    this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID)
+    this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID, checksum)
   }
 
     uploadFileCallback = (dataFromFileUpload) => {

@@ -67,13 +67,14 @@ contract Authentication is Killable {
         string description;
         uint cost;          //in wei
         string bcdbTxID;
+        string checksum;
     }
 
     bytes32[] masterModelIdentifiers;
     //modelId => model
     mapping(bytes32 => MasterModel) masterModels;
 
-    function newModel(bytes32 modelname, string description, uint cost, string bcdbTxID)
+    function newModel(bytes32 modelname, string description, uint cost, string bcdbTxID, string checksum)
     public
     payable
     onlyExistingUser
@@ -88,6 +89,7 @@ contract Authentication is Killable {
         masterModels[id].description = description;
         masterModels[id].cost = cost;
         masterModels[id].bcdbTxID = bcdbTxID;
+        masterModels[id].checksum = checksum;
         return success;
     }
 
@@ -96,7 +98,7 @@ contract Authentication is Killable {
     }
 
     function getMasterModelDetails(bytes32 id) public view onlyExistingUser
-    returns (bytes32, bytes32, address, string, uint, string) {
+    returns (bytes32, bytes32, address, string, uint, string, string) {
 
         return (
         masterModels[id].modelname,
@@ -104,7 +106,8 @@ contract Authentication is Killable {
         masterModels[id].owner,
         masterModels[id].description,
         masterModels[id].cost,
-        masterModels[id].bcdbTxID);
+        masterModels[id].bcdbTxID,
+        masterModels[id].checksum);
     }
 
 
@@ -114,7 +117,6 @@ contract Authentication is Killable {
         bytes32 masterModelID;
         bytes32 purchaseID;
         string bcdbTxID;
-//        bool uploaded;
         bool printed;
     }
 
@@ -189,7 +191,7 @@ contract Authentication is Killable {
         return purchaseIDs;
     }
 
-    function getPurchaseByID(bytes32 pID) public returns(address, address, bytes32, uint, bool, bool) {
+    function getPurchaseByID(bytes32 pID) public view returns(address, address, bytes32, uint, bool, bool) {
         return(
         purchases[pID].buyer,
         purchases[pID].owner,
