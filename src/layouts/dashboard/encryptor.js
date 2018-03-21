@@ -9,8 +9,8 @@ var seed = 'PAUL9NOZTUVHPBKLTFVRJZTOPODGTYHRUIACDYDKRNAQMCUZGNWMDSDZMPWHKQINYFPY
 // Encrypt 
 var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), seed);
  //Passphrase is a 82 character random string.
-	w
-// Decrypt 
+
+// Decrypt
 //var bytes  = CryptoJS.AES.decrypt(ciphertext.toString(), seed);
 //var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
 var cipherArray = [ciphertext, seed];//Need to return 2 values from function so put them into an array
