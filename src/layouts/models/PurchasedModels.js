@@ -154,7 +154,8 @@ class PurchasedModels extends Component {
             return (
                 <div>
                     {this.renderPurchases()}
-                    {/*<button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>*/}
+                    <p>Click refresh if the table is not up-to-date.</p>
+                    <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
                 </div>
             )
 
