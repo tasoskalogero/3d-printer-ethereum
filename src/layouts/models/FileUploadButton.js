@@ -20,6 +20,8 @@ class FileUploadButton extends React.Component {
 
     onFormSubmit(e){
         e.preventDefault();
+        if(this.state.file === null)
+            return alert("File is missing");
         console.log(this.state.file);
         this.uploadCopy();
     }
@@ -47,8 +49,11 @@ class FileUploadButton extends React.Component {
 
         console.log("Uploaded copy file for: " , this.state.masterModelID);
 
-        let txID = await masterAssetBigchain(this.state.file, copyModelName, copyModeldescription, copyModelCost, currentAddress);
-
+        let result = await masterAssetBigchain(this.state.file, copyModelName, copyModeldescription, copyModelCost, currentAddress);
+        if(result[0] === 1) {
+            return alert("BigchainDB error - " + result[1]);
+        }
+        let txID = result[1];
         let success = await instance.newModelCopy(this.state.masterModelID, this.state.purchaseID, txID, {from: currentAddress});
         this.props.onNewCopyUpload();
         return alert('Thank you, your model has been stored')

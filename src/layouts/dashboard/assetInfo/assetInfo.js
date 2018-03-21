@@ -39,8 +39,21 @@ class AssetInfo extends Component {
     event.preventDefault();
     let web3 = store.getState().web3.web3Instance;
     let owner = web3.eth.coinbase;
-    let txID = await masterAssetBigchain(this.state.uploadedFile, this.state.modelname, this.state.description, web3.toWei(this.state.cost), owner);
-    this.setState({bcdbTxID: txID});
+
+    if(this.state.uploadedFile === '')
+        return alert("File is missing");
+    if(this.state.modelname=== '')
+        return alert("Filename is missing");
+    if(this.state.description === '')
+        return alert("Description is missing");
+    if(this.state.cost === '')
+        return alert("Cost is missing");
+
+    let result = await masterAssetBigchain(this.state.uploadedFile, this.state.modelname, this.state.description, web3.toWei(this.state.cost), owner);
+    if(result[0] === 1) {
+        return alert("BigchainDB error - " + result[1]);
+    }
+    this.setState({bcdbTxID: result[1]});
     this.props.onAssetFormSubmit(this.state.modelname, this.state.description, this.state.cost, this.state.bcdbTxID)
   }
 

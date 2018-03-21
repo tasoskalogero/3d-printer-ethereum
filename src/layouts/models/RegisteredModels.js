@@ -14,7 +14,8 @@ class RegisteredModels extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            modelsAll: []
+            modelsAll: [],
+            status: ''
         };
     }
     componentWillMount() {
@@ -28,12 +29,16 @@ class RegisteredModels extends Component {
 
     refreshModels() {
         console.log("Refreshing models");
-        this.getModels()
-            .then(result => {
-                this.setState ({
-                    modelsAll: result
+        this.setState({status:'Refreshing models...Please wait'});
+        setTimeout(function () {
+            this.getModels()
+                .then(result => {
+                    this.setState ({
+                        modelsAll: result,
+                        status:''
+                    });
                 });
-            });
+        }.bind(this), 7000)
     }
 
     async getModels() {
@@ -92,8 +97,7 @@ class RegisteredModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Available models</h1>
-                            <p>List with available models:</p>
+                            <h1>Available models</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -122,7 +126,7 @@ class RegisteredModels extends Component {
                 <main className="container">
                     <div className="pure-g">
                         <div className="pure-u-1-1">
-                            <h1>Available models</h1>
+                            <h1>Available models</h1> <div>{this.state.status}</div>
                         </div>
                     </div>
 
@@ -167,6 +171,7 @@ class RegisteredModels extends Component {
         return (
             <div>
                 {this.renderAllModels()}
+                <p>Click refresh if the table is not up-to-date.</p>
                 <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
             </div>
         )

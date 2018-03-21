@@ -155,7 +155,7 @@ class UploadedCopies extends Component {
             return (
                 <div>
                     {this.renderCopyModels()}
-                    <p>Please click the Refresh button if the entry doesn't appear above.</p>
+                    <p>Click refresh if the table is not up-to-date.</p>
                     <button className="pure-button pure-button-primary" onClick={() => this.refreshModels()}>Refresh</button>
                 </div>
             )
