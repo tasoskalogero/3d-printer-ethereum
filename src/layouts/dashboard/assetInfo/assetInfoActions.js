@@ -1,9 +1,9 @@
 import AuthenticationContract from '../../../../build/contracts/Authentication.json'
 import store from '../../../store'
 
-const contract = require('truffle-contract')
+const contract = require('truffle-contract');
 
-export const USER_UPDATED = 'USER_UPDATED'
+export const USER_UPDATED = 'USER_UPDATED';
 function modelUpdated(model) {
   return {
     type: USER_UPDATED,
