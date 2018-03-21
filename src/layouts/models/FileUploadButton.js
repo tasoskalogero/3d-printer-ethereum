@@ -45,10 +45,7 @@ class FileUploadButton extends React.Component {
         let copyModeldescription = masterModelDetails[3];
         let copyModelCost = web3Inst.fromWei(masterModelDetails[4]);
 
-        console.log("UPLOAD COPY FOR: " , this.state.masterModelID);
-        console.log(copyModelName);
-        console.log(copyModeldescription);
-        console.log(copyModelCost);
+        console.log("Uploaded copy file for: " , this.state.masterModelID);
 
         let txID = await masterAssetBigchain(this.state.file, copyModelName, copyModeldescription, copyModelCost, currentAddress);
 

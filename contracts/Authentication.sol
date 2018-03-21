@@ -149,7 +149,6 @@ contract Authentication is Killable {
     }
 
     function setCopyModelPrinted(bytes32 cmID) public {
-        //TODO list with registered printers maybe?
         require(msg.sender == 0x821aea9a577a9b44299b9c15c88cf3087f3b5544);        //only printer can change it
         allModelsCopies[cmID].printed = true;
     }
